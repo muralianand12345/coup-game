@@ -77,7 +77,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
                 </div>
             ) : null}
 
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                 <button
                     onClick={() => handleActionClick(ActionType.INCOME)}
                     disabled={disabled || mustCoup}
@@ -104,7 +104,9 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
                     Coup
                     <span className="block text-xs text-gray-300">-7 coins</span>
                 </button>
+            </div>
 
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                 <button
                     onClick={() => handleActionClick(ActionType.TAX)}
                     disabled={disabled || mustCoup}
@@ -119,7 +121,7 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
                     disabled={disabled || mustCoup || !canAffordAssassinate}
                     className="btn-secondary text-sm py-3 border-gray-600 text-gray-400 hover:bg-gray-600 hover:text-white"
                 >
-                    Assassinate
+                    Assassinate (Assassin)
                     <span className="block text-xs opacity-70">-3 coins</span>
                 </button>
 
@@ -137,8 +139,8 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
                     disabled={disabled || mustCoup}
                     className="btn-secondary text-sm py-3 border-green-500 text-green-400 hover:bg-green-500 hover:text-white"
                 >
-                    Exchange
-                    <span className="block text-xs opacity-70">Ambassador</span>
+                    Exchange (Ambassador)
+                    <span className="block text-xs opacity-70">Draw 2 cards, return 2 cards</span>
                 </button>
             </div>
         </div>
