@@ -13,19 +13,13 @@ const httpServer = createServer(app);
 
 const clientUrl = process.env.CLIENT_URL || 'http://localhost:5173';
 
-const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, {
-  cors: {
-    origin: clientUrl,
-    methods: ['GET', 'POST'],
-    credentials: true,
-  },
-});
+const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, { cors: { origin: clientUrl, methods: ['GET', 'POST'], credentials: true } });
 
 app.use(cors({ origin: clientUrl, credentials: true }));
 app.use(express.json());
 
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: Date.now() });
+	res.json({ status: 'ok', timestamp: Date.now() });
 });
 
 setupSocketHandlers(io);
@@ -33,6 +27,6 @@ setupSocketHandlers(io);
 const PORT = process.env.PORT || 3001;
 
 httpServer.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
-  console.log(`Accepting connections from: ${clientUrl}`);
+	console.log(`Server running on port ${PORT}`);
+	console.log(`Accepting connections from: ${clientUrl}`);
 });
