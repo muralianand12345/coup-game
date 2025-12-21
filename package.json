@@ -1,0 +1,22 @@
+{
+    "name": "coup-game",
+    "version": "1.0.0",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ],
+    "scripts": {
+        "dev:client": "yarn workspace @coup/client dev",
+        "dev:server": "yarn workspace @coup/server dev",
+        "build:client": "yarn workspace @coup/client build",
+        "build:server": "yarn workspace @coup/server build",
+        "build": "yarn build:shared && yarn build:server && yarn build:client",
+        "build:shared": "yarn workspace @coup/shared build",
+        "dev": "concurrently \"yarn dev:server\" \"yarn dev:client\"",
+        "clean": "rm -rf packages/*/dist packages/*/node_modules node_modules"
+    },
+    "devDependencies": {
+        "concurrently": "^8.2.2",
+        "typescript": "^5.3.3"
+    }
+}

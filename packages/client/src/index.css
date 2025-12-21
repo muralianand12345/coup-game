@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  background-color: #0a0a0a;
+  color: #ffffff;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+@layer components {
+  .card-base {
+    @apply relative w-24 h-36 rounded-lg border-2 flex flex-col items-center justify-center transition-all duration-200;
+  }
+
+  .card-front {
+    @apply bg-white text-black border-black;
+  }
+
+  .card-back {
+    @apply bg-coup-card border-coup-border;
+  }
+
+  .card-revealed {
+    @apply opacity-50;
+  }
+
+  .btn-primary {
+    @apply px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-danger {
+    @apply px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .input-field {
+    @apply px-4 py-2 bg-coup-card border-2 border-coup-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors;
+  }
+}
