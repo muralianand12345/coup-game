@@ -1,4 +1,4 @@
-import { GameState, GamePhase, Player, Card, CardType, ActionType, PendingAction, PendingBlock, LogEntry, ACTION_CONFIG, STARTING_COINS, CARDS_PER_TYPE } from '@coup/shared';
+import { GameState, GamePhase, Player, Card, CardType, ActionType, PendingAction, LogEntry, ACTION_CONFIG, STARTING_COINS, CARDS_PER_TYPE } from '@coup/shared';
 import { generateId, shuffleArray } from '../utils/helpers';
 
 export const createDeck = (): Card[] => {
@@ -40,6 +40,7 @@ export const createInitialGameState = (roomId: string, players: Player[]): GameS
 		winner: null,
 		turnTimeRemaining: 0,
 		gameLog: [{ id: generateId(), timestamp: Date.now(), message: 'Game started!', type: 'system' }],
+		passedPlayers: [],
 	};
 };
 

@@ -1,8 +1,8 @@
 import { FC } from 'react';
-import { useSocket } from './hooks/useSocket';
-import { useGameStore } from './store/gameStore';
 import { Home } from './components/Home';
 import { Lobby } from './components/Lobby';
+import { useSocket } from './hooks/useSocket';
+import { useGameStore } from './store/gameStore';
 import { GameBoard } from './components/GameBoard';
 
 const App: FC = () => {

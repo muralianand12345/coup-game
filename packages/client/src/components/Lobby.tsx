@@ -30,52 +30,104 @@ export const Lobby: FC<LobbyProps> = ({
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="bg-coup-card border-2 border-coup-border rounded-lg p-6 max-w-md w-full">
-                <div className="text-center mb-6">
-                    <h1 className="text-2xl font-bold mb-2">Game Lobby</h1>
-                    <div className="flex items-center justify-center gap-2">
-                        <span className="text-gray-400">Room Code:</span>
+        <div className="page-container min-h-screen flex items-center justify-center p-6">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="glass-panel p-8 max-w-lg w-full animate-scale-in relative z-10">
+                <div className="text-center mb-8">
+                    <h1 className="text-2xl font-semibold tracking-tight mb-6">Game Lobby</h1>
+
+                    <div className="inline-flex flex-col items-center">
+                        <span className="text-xs text-zinc-500 uppercase tracking-wider mb-2">Room Code</span>
                         <button
                             onClick={copyRoomCode}
-                            className="font-mono text-xl bg-coup-bg px-3 py-1 rounded border border-coup-border hover:border-white transition-colors"
+                            className="group relative px-6 py-3 rounded-xl bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-300"
                         >
-                            {room.id}
+                            <span className="font-mono text-3xl tracking-[0.3em] text-zinc-100">
+                                {room.id}
+                            </span>
+                            <span className="absolute -bottom-6 left-1/2 -translate-x-1/2 text-xs text-zinc-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                                Click to copy
+                            </span>
                         </button>
+                        {copied && (
+                            <span className="mt-8 text-emerald-400 text-xs animate-fade-in flex items-center gap-1">
+                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                                Copied to clipboard
+                            </span>
+                        )}
                     </div>
-                    {copied && <p className="text-green-400 text-sm mt-1">Copied!</p>}
                 </div>
 
-                <div className="space-y-3 mb-6">
-                    <h2 className="text-sm font-bold text-gray-400">
-                        Players ({room.players.length}/{room.maxPlayers})
-                    </h2>
-                    {room.players.map((player) => (
-                        <div
-                            key={player.id}
-                            className="flex items-center justify-between p-3 bg-coup-bg rounded border border-coup-border"
-                        >
-                            <div className="flex items-center gap-2">
-                                <span className={player.id === playerId ? 'text-yellow-400' : ''}>
-                                    {player.name}
-                                </span>
-                                {player.id === room.hostId && (
-                                    <span className="text-xs bg-white text-black px-2 py-0.5 rounded">
-                                        HOST
-                                    </span>
-                                )}
+                <div className="mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                            Players
+                        </span>
+                        <span className="text-xs text-zinc-600">
+                            {room.players.length} / {room.maxPlayers}
+                        </span>
+                    </div>
+
+                    <div className="space-y-2">
+                        {room.players.map((player, index) => (
+                            <div
+                                key={player.id}
+                                className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 animate-fade-in-up ${player.id === playerId
+                                        ? 'bg-zinc-900/80 border-zinc-700'
+                                        : 'bg-zinc-900/40 border-zinc-800/50'
+                                    }`}
+                                style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                                <div className="flex items-center gap-3">
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold ${player.id === playerId
+                                            ? 'bg-zinc-100 text-zinc-900'
+                                            : 'bg-zinc-800 text-zinc-400'
+                                        }`}>
+                                        {player.name.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div className="flex flex-col">
+                                        <span className={`font-medium ${player.id === playerId ? 'text-zinc-100' : 'text-zinc-400'}`}>
+                                            {player.name}
+                                        </span>
+                                        {player.id === room.hostId && (
+                                            <span className="text-[10px] text-amber-400 uppercase tracking-wider">Host</span>
+                                        )}
+                                    </div>
+                                </div>
+
+                                <div className="flex items-center gap-2">
+                                    {player.id === room.hostId ? (
+                                        <span className="text-zinc-600 text-xs">—</span>
+                                    ) : player.isReady ? (
+                                        <span className="flex items-center gap-1.5 text-emerald-400 text-xs">
+                                            <div className="status-indicator active" />
+                                            Ready
+                                        </span>
+                                    ) : (
+                                        <span className="flex items-center gap-1.5 text-zinc-500 text-xs">
+                                            <div className="status-indicator waiting" />
+                                            Waiting
+                                        </span>
+                                    )}
+                                </div>
                             </div>
-                            <div>
-                                {player.id === room.hostId ? (
-                                    <span className="text-gray-500 text-sm">-</span>
-                                ) : player.isReady ? (
-                                    <span className="text-green-400">Ready ✓</span>
-                                ) : (
-                                    <span className="text-gray-500">Not Ready</span>
-                                )}
+                        ))}
+
+                        {Array.from({ length: room.maxPlayers - room.players.length }).map((_, i) => (
+                            <div
+                                key={`empty-${i}`}
+                                className="flex items-center justify-center p-4 rounded-xl border border-dashed border-zinc-800/50 text-zinc-700 text-sm"
+                            >
+                                Waiting for player...
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
 
                 <div className="space-y-3">
@@ -83,10 +135,10 @@ export const Lobby: FC<LobbyProps> = ({
                         <button
                             onClick={onStartGame}
                             disabled={!canStart}
-                            className="btn-primary w-full"
+                            className="btn-primary w-full py-4"
                         >
                             {room.players.length < MIN_PLAYERS
-                                ? `Need ${MIN_PLAYERS - room.players.length} more player(s)`
+                                ? `Need ${MIN_PLAYERS - room.players.length} more player${MIN_PLAYERS - room.players.length > 1 ? 's' : ''}`
                                 : !allReady
                                     ? 'Waiting for players...'
                                     : 'Start Game'}
@@ -94,13 +146,13 @@ export const Lobby: FC<LobbyProps> = ({
                     ) : (
                         <button
                             onClick={onToggleReady}
-                            className={`w-full ${myPlayer?.isReady ? 'btn-secondary' : 'btn-primary'}`}
+                            className={`w-full py-4 ${myPlayer?.isReady ? 'btn-secondary' : 'btn-primary'}`}
                         >
-                            {myPlayer?.isReady ? 'Not Ready' : 'Ready'}
+                            {myPlayer?.isReady ? 'Cancel Ready' : "I'm Ready"}
                         </button>
                     )}
 
-                    <button onClick={onLeaveRoom} className="btn-secondary w-full">
+                    <button onClick={onLeaveRoom} className="btn-secondary w-full py-3 text-zinc-400">
                         Leave Room
                     </button>
                 </div>

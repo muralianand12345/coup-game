@@ -1,4 +1,4 @@
-import { Room, Player, GameState } from '@coup/shared';
+import { Room, GameState } from '@coup/shared';
 import { generateId, generateRoomCode } from '../utils/helpers';
 import { createPlayer, createInitialGameState } from '../game/engine';
 
@@ -51,68 +51,52 @@ export const joinRoom = (roomId: string, playerName: string, socketId: string): 
 	return { room, playerId };
 };
 
-export const rejoinRoom = (roomId: string, playerId: string, socketId: string): Room | null => {
-	const room = store.rooms.get(roomId);
-	if (!room) {
-		console.log(`Rejoin failed: Room ${roomId} not found`);
-		return null;
-	}
-
-	const player = room.players.find((p) => p.id === playerId);
-	if (!player) {
-		console.log(`Rejoin failed: Player ${playerId} not found in room ${roomId}`);
-		return null;
-	}
-
-	for (const [existingSocketId, pId] of store.socketToPlayer.entries()) {
-		if (pId === playerId && existingSocketId !== socketId) store.socketToPlayer.delete(existingSocketId);
-	}
-
-	player.isConnected = true;
-	store.socketToPlayer.set(socketId, playerId);
-	store.playerToRoom.set(playerId, roomId);
-
-	if (room.gameState) {
-		const gamePlayer = room.gameState.players.find((p) => p.id === playerId);
-		if (gamePlayer) gamePlayer.isConnected = true;
-	}
-
-	console.log(`Player ${player.name} (${playerId}) rejoined room ${roomId}`);
-	return room;
-};
-
-export const leaveRoom = (socketId: string): { room: Room | null; playerId: string | null } => {
+export const leaveRoom = (socketId: string): { room: Room | null; playerId: string | null; shouldDeleteRoom: boolean } => {
 	const playerId = store.socketToPlayer.get(socketId);
-	if (!playerId) return { room: null, playerId: null };
+	if (!playerId) return { room: null, playerId: null, shouldDeleteRoom: false };
 
 	const roomId = store.playerToRoom.get(playerId);
-	if (!roomId) return { room: null, playerId };
+	if (!roomId) return { room: null, playerId, shouldDeleteRoom: false };
 
 	const room = store.rooms.get(roomId);
-	if (!room) return { room: null, playerId };
+	if (!room) return { room: null, playerId, shouldDeleteRoom: false };
+
+	store.socketToPlayer.delete(socketId);
+	store.playerToRoom.delete(playerId);
 
 	if (room.isStarted) {
 		const player = room.players.find((p) => p.id === playerId);
-		if (player) player.isConnected = false;
+		if (player) {
+			player.isAlive = false;
+			player.isConnected = false;
+		}
 		if (room.gameState) {
 			const gamePlayer = room.gameState.players.find((p) => p.id === playerId);
-			if (gamePlayer) gamePlayer.isConnected = false;
+			if (gamePlayer) {
+				gamePlayer.isAlive = false;
+				gamePlayer.isConnected = false;
+			}
 		}
-	} else {
-		room.players = room.players.filter((p) => p.id !== playerId);
-		store.playerToRoom.delete(playerId);
 
-		if (room.players.length === 0) {
+		const connectedPlayers = room.players.filter((p) => p.isConnected);
+		if (connectedPlayers.length === 0) {
 			store.rooms.delete(roomId);
-			store.socketToPlayer.delete(socketId);
-			return { room: null, playerId };
+			return { room: null, playerId, shouldDeleteRoom: true };
 		}
 
-		if (room.hostId === playerId) room.hostId = room.players[0].id;
+		return { room, playerId, shouldDeleteRoom: false };
 	}
 
-	store.socketToPlayer.delete(socketId);
-	return { room, playerId };
+	room.players = room.players.filter((p) => p.id !== playerId);
+
+	if (room.players.length === 0) {
+		store.rooms.delete(roomId);
+		return { room: null, playerId, shouldDeleteRoom: true };
+	}
+
+	if (room.hostId === playerId) room.hostId = room.players[0].id;
+
+	return { room, playerId, shouldDeleteRoom: false };
 };
 
 export const togglePlayerReady = (socketId: string): Room | null => {
@@ -185,3 +169,17 @@ export const deleteRoom = (roomId: string): void => {
 	room.players.forEach((p) => store.playerToRoom.delete(p.id));
 	store.rooms.delete(roomId);
 };
+
+export const cleanupEmptyRooms = (): void => {
+	const now = Date.now();
+	for (const [roomId, room] of store.rooms.entries()) {
+		const connectedPlayers = room.players.filter((p) => p.isConnected);
+		if (connectedPlayers.length === 0) {
+			console.log(`Cleaning up empty room: ${roomId}`);
+			room.players.forEach((p) => store.playerToRoom.delete(p.id));
+			store.rooms.delete(roomId);
+		}
+	}
+};
+
+export const getRoomCount = (): number => store.rooms.size;

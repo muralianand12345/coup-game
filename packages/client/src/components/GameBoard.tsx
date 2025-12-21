@@ -1,14 +1,14 @@
-import { FC } from 'react';
-import { GameState, GamePhase } from '@coup/shared';
+import { FC, useState } from 'react';
+import { GameState, GamePhase, ChatMessage } from '@coup/shared';
+import { Chat } from './Chat';
+import { Card } from './Card';
+import { GameLog } from './GameLog';
 import { PlayerInfo } from './PlayerInfo';
 import { ActionButtons } from './ActionButtons';
 import { ResponsePanel } from './ResponsePanel';
-import { LoseInfluenceModal } from './LoseInfluenceModal';
 import { ExchangeModal } from './ExchangeModal';
-import { GameLog } from './GameLog';
-import { Chat } from './Chat';
-import { Card } from './Card';
-import { ChatMessage } from '@coup/shared';
+import { LoseInfluenceModal } from './LoseInfluenceModal';
+import { Cheatsheet, CheatsheetButton } from './Cheatsheet';
 
 interface GameBoardProps {
     gameState: GameState;
@@ -39,6 +39,8 @@ export const GameBoard: FC<GameBoardProps> = ({
     onSendChat,
     onLeaveRoom,
 }) => {
+    const [showCheatsheet, setShowCheatsheet] = useState(false);
+
     const myPlayer = gameState.players.find(p => p.id === playerId);
     const otherPlayers = gameState.players.filter(p => p.id !== playerId);
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
@@ -50,8 +52,7 @@ export const GameBoard: FC<GameBoardProps> = ({
         gameState.playerLosingInfluence === playerId;
 
     const needToExchange =
-        gameState.phase === GamePhase.EXCHANGE_SELECT &&
-        isMyTurn;
+        gameState.phase === GamePhase.EXCHANGE_SELECT && isMyTurn;
 
     const showResponsePanel =
         (gameState.phase === GamePhase.ACTION_RESPONSE ||
@@ -62,14 +63,34 @@ export const GameBoard: FC<GameBoardProps> = ({
 
     if (gameState.phase === GamePhase.GAME_OVER) {
         const winner = gameState.players.find(p => p.id === gameState.winner);
+        const isWinner = winner?.id === playerId;
+
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="bg-coup-card border-2 border-coup-border rounded-lg p-8 max-w-md w-full text-center">
-                    <h1 className="text-3xl font-bold mb-4">Game Over!</h1>
-                    <p className="text-xl mb-2">
-                        {winner?.id === playerId ? '🎉 You Win! 🎉' : `${winner?.name} Wins!`}
+            <div className="page-container min-h-screen flex items-center justify-center p-6">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {isWinner && (
+                        <>
+                            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
+                            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+                        </>
+                    )}
+                </div>
+
+                <div className="glass-panel p-12 max-w-md w-full text-center animate-scale-in relative z-10">
+                    <div className="text-6xl mb-6 animate-float">
+                        {isWinner ? '👑' : '💀'}
+                    </div>
+                    <h1 className="text-3xl font-bold mb-4 tracking-tight">Game Over</h1>
+                    <p className="text-xl mb-8">
+                        {isWinner ? (
+                            <span className="text-amber-400">You Win!</span>
+                        ) : (
+                            <span className="text-zinc-400">
+                                <span className="text-zinc-100">{winner?.name}</span> Wins
+                            </span>
+                        )}
                     </p>
-                    <button onClick={onLeaveRoom} className="btn-primary mt-6">
+                    <button onClick={onLeaveRoom} className="btn-primary w-full py-4">
                         Leave Game
                     </button>
                 </div>
@@ -78,7 +99,9 @@ export const GameBoard: FC<GameBoardProps> = ({
     }
 
     return (
-        <div className="min-h-screen p-4">
+        <div className="page-container min-h-screen">
+            <Cheatsheet isOpen={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
+
             {needToLoseInfluence && myPlayer && (
                 <LoseInfluenceModal
                     cards={myPlayer.cards}
@@ -94,51 +117,85 @@ export const GameBoard: FC<GameBoardProps> = ({
                 />
             )}
 
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <div className="text-sm text-gray-400">
-                        Room: <span className="font-mono">{gameState.roomId}</span>
+            <header className="sticky top-0 z-10 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6">
+                            <h1 className="text-xl font-bold tracking-tight">COUP</h1>
+                            <div className="h-6 w-px bg-zinc-800" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-zinc-600 uppercase tracking-wider">Room</span>
+                                <span className="font-mono text-sm text-zinc-300">{gameState.roomId}</span>
+                            </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <CheatsheetButton onClick={() => setShowCheatsheet(true)} />
+                            <button onClick={onLeaveRoom} className="btn-secondary text-xs py-2 px-4">
+                                Leave
+                            </button>
+                        </div>
                     </div>
-                    <button onClick={onLeaveRoom} className="btn-secondary text-sm py-1 px-3">
-                        Leave
-                    </button>
                 </div>
+            </header>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="lg:col-span-2 space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {otherPlayers.map((player) => (
+            <main className="max-w-7xl mx-auto p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-3 space-y-3">
+                        {otherPlayers.map((player, index) => (
+                            <div
+                                key={player.id}
+                                className="animate-slide-in-left"
+                                style={{ animationDelay: `${index * 0.05}s` }}
+                            >
                                 <PlayerInfo
-                                    key={player.id}
                                     player={player}
                                     isCurrentTurn={currentPlayer.id === player.id}
                                     isYou={false}
                                 />
-                            ))}
-                        </div>
+                            </div>
+                        ))}
+                    </div>
 
-                        <div className="bg-coup-card border-2 border-white rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="font-bold text-yellow-400">Your Hand</span>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-yellow-400">●</span>
-                                    <span className="font-mono text-xl">{myPlayer?.coins}</span>
-                                    <span className="text-gray-400 text-sm ml-1">coins</span>
+                    <div className="lg:col-span-6 space-y-6">
+                        <div className="glass-panel p-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
+                            <div className="flex items-center justify-between mb-5">
+                                <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Your Hand</span>
+                                <div className="coin-display">
+                                    <div className="coin-icon">$</div>
+                                    <span className="font-mono text-lg font-medium text-amber-400">{myPlayer?.coins}</span>
                                 </div>
                             </div>
                             <div className="flex gap-4 justify-center">
-                                {myPlayer?.cards.map((card) => (
-                                    <Card key={card.id} card={card} faceUp={true} />
+                                {myPlayer?.cards.map((card, index) => (
+                                    <div
+                                        key={card.id}
+                                        className="animate-card-enter"
+                                        style={{ animationDelay: `${0.15 + index * 0.1}s` }}
+                                    >
+                                        <Card card={card} faceUp={true} />
+                                    </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="text-center p-2 bg-coup-bg rounded">
+                        <div
+                            className={`
+                                text-center p-4 rounded-xl border transition-all duration-500 animate-fade-in-up
+                                ${isMyTurn
+                                    ? 'bg-emerald-500/5 border-emerald-500/20'
+                                    : 'bg-zinc-900/40 border-zinc-800/50'
+                                }
+                            `}
+                            style={{ animationDelay: '0.2s' }}
+                        >
                             {isMyTurn ? (
-                                <span className="text-green-400 font-bold">Your Turn!</span>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="status-indicator active" />
+                                    <span className="text-emerald-400 font-medium">Your Turn</span>
+                                </div>
                             ) : (
-                                <span className="text-gray-400">
-                                    Waiting for <span className="text-white">{currentPlayer.name}</span>...
+                                <span className="text-zinc-500">
+                                    Waiting for <span className="text-zinc-300 font-medium">{currentPlayer.name}</span>
                                 </span>
                             )}
                         </div>
@@ -162,16 +219,20 @@ export const GameBoard: FC<GameBoardProps> = ({
                         ) : null}
                     </div>
 
-                    <div className="space-y-4">
-                        <GameLog logs={gameState.gameLog} />
-                        <Chat
-                            messages={chatMessages}
-                            onSendMessage={onSendChat}
-                            playerId={playerId}
-                        />
+                    <div className="lg:col-span-3 space-y-4">
+                        <div className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
+                            <GameLog logs={gameState.gameLog} />
+                        </div>
+                        <div className="animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
+                            <Chat
+                                messages={chatMessages}
+                                onSendMessage={onSendChat}
+                                playerId={playerId}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

@@ -1,27 +1,7 @@
 import { useEffect, useCallback } from 'react';
-import { getSocket, connectSocket } from '../services/socket';
-import { useGameStore } from '../store/gameStore';
 import { ActionType, CardType } from '@coup/shared';
-
-const SESSION_STORAGE_KEY = 'coup_session';
-
-interface SessionData {
-	playerId: string;
-	roomId: string;
-}
-
-const saveSession = (playerId: string, roomId: string): void => {
-	sessionStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify({ playerId, roomId }));
-};
-
-const getSession = (): SessionData | null => {
-	const data = sessionStorage.getItem(SESSION_STORAGE_KEY);
-	return data ? JSON.parse(data) : null;
-};
-
-const clearSession = (): void => {
-	sessionStorage.removeItem(SESSION_STORAGE_KEY);
-};
+import { useGameStore } from '../store/gameStore';
+import { getSocket, connectSocket } from '../services/socket';
 
 export const useSocket = () => {
 	const { setPlayerId, setRoom, setGameState, addChatMessage, setTimer, setError, reset } = useGameStore();
@@ -30,62 +10,12 @@ export const useSocket = () => {
 		connectSocket();
 		const socket = getSocket();
 
-		socket.on('roomUpdate', (room) => {
-			setRoom(room);
-		});
-
-		socket.on('gameStateUpdate', (state) => {
-			setGameState(state);
-		});
-
-		socket.on('chatMessage', (message) => {
-			addChatMessage(message);
-		});
-
-		socket.on('timerUpdate', (seconds) => {
-			setTimer(seconds);
-		});
-
-		socket.on('error', (message) => {
-			setError(message);
-		});
-
-		socket.on('playerDisconnected', (playerId) => {
-			console.log('Player disconnected:', playerId);
-		});
-
-		socket.on('playerReconnected', (playerId) => {
-			console.log('Player reconnected:', playerId);
-		});
-
-		// Attempt to rejoin when socket connects (including reconnections)
-		const attemptRejoin = () => {
-			const session = getSession();
-			if (session) {
-				console.log('Attempting to rejoin room:', session.roomId);
-				socket.emit('rejoinRoom', session.roomId, session.playerId, (response) => {
-					if (response.success && response.playerId) {
-						console.log('Rejoin successful');
-						setPlayerId(response.playerId);
-						setRoom(response.room || null);
-					} else {
-						console.log('Rejoin failed:', response.error);
-						clearSession();
-					}
-				});
-			}
-		};
-
-		// Try to rejoin on initial connect
-		socket.on('connect', () => {
-			console.log('Socket connected');
-			attemptRejoin();
-		});
-
-		// If already connected when this effect runs, attempt rejoin immediately
-		if (socket.connected) {
-			attemptRejoin();
-		}
+		socket.on('roomUpdate', (room) => setRoom(room));
+		socket.on('gameStateUpdate', (state) => setGameState(state));
+		socket.on('chatMessage', (message) => addChatMessage(message));
+		socket.on('timerUpdate', (seconds) => setTimer(seconds));
+		socket.on('error', (message) => setError(message));
+		socket.on('playerDisconnected', (playerId) => console.log('Player disconnected:', playerId));
 
 		return () => {
 			socket.off('roomUpdate');
@@ -94,8 +24,6 @@ export const useSocket = () => {
 			socket.off('timerUpdate');
 			socket.off('error');
 			socket.off('playerDisconnected');
-			socket.off('playerReconnected');
-			socket.off('connect');
 		};
 	}, [setPlayerId, setRoom, setGameState, addChatMessage, setTimer, setError]);
 
@@ -107,7 +35,6 @@ export const useSocket = () => {
 					if (response.success && response.playerId && response.room) {
 						setPlayerId(response.playerId);
 						setRoom(response.room);
-						saveSession(response.playerId, response.room.id);
 						resolve(true);
 					} else {
 						setError(response.error || 'Failed to create room');
@@ -127,7 +54,6 @@ export const useSocket = () => {
 					if (response.success && response.playerId && response.room) {
 						setPlayerId(response.playerId);
 						setRoom(response.room);
-						saveSession(response.playerId, response.room.id);
 						resolve(true);
 					} else {
 						setError(response.error || 'Failed to join room');
@@ -142,7 +68,6 @@ export const useSocket = () => {
 	const leaveRoom = useCallback(() => {
 		const socket = getSocket();
 		socket.emit('leaveRoom');
-		clearSession();
 		reset();
 	}, [reset]);
 

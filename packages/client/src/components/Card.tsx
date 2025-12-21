@@ -9,12 +9,32 @@ interface CardProps {
     small?: boolean;
 }
 
-const cardColors: Record<CardTypeEnum, string> = {
-    [CardTypeEnum.DUKE]: '#7c3aed',
-    [CardTypeEnum.ASSASSIN]: '#1f2937',
-    [CardTypeEnum.CAPTAIN]: '#0369a1',
-    [CardTypeEnum.AMBASSADOR]: '#059669',
-    [CardTypeEnum.CONTESSA]: '#be123c',
+const cardStyles: Record<CardTypeEnum, { bg: string; accent: string; icon: string }> = {
+    [CardTypeEnum.DUKE]: {
+        bg: 'from-violet-600 to-purple-700',
+        accent: 'violet',
+        icon: '👑'
+    },
+    [CardTypeEnum.ASSASSIN]: {
+        bg: 'from-zinc-700 to-zinc-900',
+        accent: 'zinc',
+        icon: '🗡️'
+    },
+    [CardTypeEnum.CAPTAIN]: {
+        bg: 'from-sky-600 to-blue-700',
+        accent: 'sky',
+        icon: '⚓'
+    },
+    [CardTypeEnum.AMBASSADOR]: {
+        bg: 'from-emerald-600 to-green-700',
+        accent: 'emerald',
+        icon: '📜'
+    },
+    [CardTypeEnum.CONTESSA]: {
+        bg: 'from-rose-600 to-pink-700',
+        accent: 'rose',
+        icon: '👸'
+    },
 };
 
 export const Card: FC<CardProps> = ({
@@ -26,19 +46,29 @@ export const Card: FC<CardProps> = ({
 }) => {
     const showFace = faceUp && card;
     const info = card ? CARD_INFO[card.type] : null;
-    const color = card ? cardColors[card.type] : '#333';
+    const styles = card ? cardStyles[card.type] : null;
 
-    const baseClasses = small
-        ? 'w-16 h-24 text-xs'
-        : 'w-24 h-36 text-sm';
+    const sizeClasses = small ? 'w-16 h-24' : 'w-24 h-36';
+    const iconSize = small ? 'text-xl' : 'text-3xl';
+    const nameSize = small ? 'text-[9px]' : 'text-xs';
 
     if (!showFace) {
         return (
             <div
                 onClick={onClick}
-                className={`${baseClasses} rounded-lg border-2 border-coup-border bg-coup-card flex items-center justify-center cursor-pointer hover:border-white transition-all ${selected ? 'ring-2 ring-white' : ''}`}
+                className={`
+                    card-container ${sizeClasses}
+                    ${onClick ? 'cursor-pointer' : ''}
+                `}
             >
-                <div className="text-2xl opacity-30">?</div>
+                <div className={`
+                    game-card game-card-back w-full h-full
+                    ${selected ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-900' : ''}
+                `}>
+                    <div className="absolute inset-0 flex items-center justify-center">
+                        <div className="w-6 h-6 border border-zinc-700 rotate-45 opacity-40" />
+                    </div>
+                </div>
             </div>
         );
     }
@@ -46,26 +76,36 @@ export const Card: FC<CardProps> = ({
     return (
         <div
             onClick={onClick}
-            className={`${baseClasses} rounded-lg border-2 flex flex-col items-center justify-between p-2 cursor-pointer transition-all ${card?.isRevealed ? 'opacity-50' : ''} ${selected ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''}`}
-            style={{
-                borderColor: color,
-                backgroundColor: 'white',
-            }}
+            className={`
+                card-container ${sizeClasses}
+                ${onClick ? 'cursor-pointer' : ''}
+            `}
         >
-            <div
-                className="text-3xl"
-                style={{ filter: card?.isRevealed ? 'grayscale(1)' : 'none' }}
-            >
-                {info?.icon}
-            </div>
-            <div
-                className="font-bold text-center"
-                style={{ color }}
-            >
-                {info?.name}
-            </div>
-            <div className="text-[10px] text-gray-600 text-center leading-tight">
-                {small ? '' : info?.ability}
+            <div className={`
+                game-card game-card-front w-full h-full p-2
+                ${card?.isRevealed ? 'opacity-40 grayscale' : ''}
+                ${selected ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-zinc-900 scale-105' : ''}
+            `}>
+                <div className={`
+                    absolute inset-0 bg-gradient-to-br ${styles?.bg} opacity-10 rounded-[14px]
+                `} />
+
+                <div className="relative z-10 h-full flex flex-col items-center justify-between py-1">
+                    <div className={`${iconSize} transition-transform duration-300`}>
+                        {styles?.icon}
+                    </div>
+
+                    <div className="text-center">
+                        <div className={`font-semibold ${nameSize} tracking-wide text-zinc-800`}>
+                            {info?.name}
+                        </div>
+                        {!small && (
+                            <div className="text-[8px] text-zinc-500 mt-1 leading-tight px-1">
+                                {info?.ability}
+                            </div>
+                        )}
+                    </div>
+                </div>
             </div>
         </div>
     );
@@ -76,13 +116,15 @@ interface CardBackProps {
 }
 
 export const CardBack: FC<CardBackProps> = ({ small = false }) => {
-    const baseClasses = small
-        ? 'w-16 h-24'
-        : 'w-24 h-36';
+    const sizeClasses = small ? 'w-16 h-24' : 'w-24 h-36';
 
     return (
-        <div className={`${baseClasses} rounded-lg border-2 border-coup-border bg-coup-card flex items-center justify-center`}>
-            <div className="w-8 h-8 border-2 border-coup-border rotate-45" />
+        <div className={`card-container ${sizeClasses}`}>
+            <div className="game-card game-card-back w-full h-full">
+                <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="w-6 h-6 border border-zinc-700 rotate-45 opacity-40" />
+                </div>
+            </div>
         </div>
     );
 };
