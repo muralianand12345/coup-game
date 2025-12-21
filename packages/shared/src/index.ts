@@ -205,6 +205,7 @@ export const CARD_INFO: Record<
 	{
 		name: string;
 		icon: string;
+		image: string;
 		ability: string;
 		blockAbility?: string;
 	}
@@ -212,33 +213,40 @@ export const CARD_INFO: Record<
 	[CardType.DUKE]: {
 		name: 'Duke',
 		icon: '👑',
+		image: '/cards/duke.png',
 		ability: 'Tax: Take 3 coins',
 		blockAbility: 'Blocks Foreign Aid',
 	},
 	[CardType.ASSASSIN]: {
 		name: 'Assassin',
 		icon: '🗡️',
+		image: '/cards/assassin.png',
 		ability: 'Assassinate: Pay 3, kill target',
 	},
 	[CardType.CAPTAIN]: {
 		name: 'Captain',
 		icon: '⚓',
+		image: '/cards/captain.png',
 		ability: 'Steal: Take 2 coins from target',
 		blockAbility: 'Blocks Stealing',
 	},
 	[CardType.AMBASSADOR]: {
 		name: 'Ambassador',
 		icon: '📜',
+		image: '/cards/ambassador.png',
 		ability: 'Exchange: Swap cards with deck',
 		blockAbility: 'Blocks Stealing',
 	},
 	[CardType.CONTESSA]: {
 		name: 'Contessa',
 		icon: '👸',
+		image: '/cards/contessa.png',
 		ability: 'No action',
 		blockAbility: 'Blocks Assassination',
 	},
 };
+
+export const CARD_BACK_IMAGE = '/cards/card-back.png';
 
 export const CHALLENGE_TIMER_SECONDS = 30;
 export const MIN_PLAYERS = 2;
