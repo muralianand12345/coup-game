@@ -24,7 +24,7 @@ CLIENT_URL=http://localhost:5173
 ```
 
 ## Scripts (workspace)
-- `yarn workspace @coup/server dev` — run ts-node-dev/ts-node watcher.
+- `yarn workspace @coup/server dev` — run `tsx watch` dev server.
 - `yarn workspace @coup/server build` — compile to `dist/`.
 - `yarn workspace @coup/server start` — run the compiled server (ensure `build` first).
 
