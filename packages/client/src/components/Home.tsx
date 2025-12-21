@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
 
 interface HomeProps {
-    onCreateRoom: (playerName: string) => Promise<boolean>;
-    onJoinRoom: (roomId: string, playerName: string) => Promise<boolean>;
+    onCreateRoom: (playerName: string, onStatusChange?: (status: string) => void) => Promise<boolean>;
+    onJoinRoom: (roomId: string, playerName: string, onStatusChange?: (status: string) => void) => Promise<boolean>;
     error: string | null;
 }
 
@@ -11,25 +11,31 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
     const [roomCode, setRoomCode] = useState('');
     const [mode, setMode] = useState<'menu' | 'create' | 'join'>('menu');
     const [loading, setLoading] = useState(false);
+    const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
 
     const handleCreate = async () => {
         if (!playerName.trim()) return;
         setLoading(true);
-        await onCreateRoom(playerName.trim());
+        setConnectionStatus(null);
+        await onCreateRoom(playerName.trim(), setConnectionStatus);
         setLoading(false);
+        setConnectionStatus(null);
     };
 
     const handleJoin = async () => {
         if (!playerName.trim() || !roomCode.trim()) return;
         setLoading(true);
-        await onJoinRoom(roomCode.trim().toUpperCase(), playerName.trim());
+        setConnectionStatus(null);
+        await onJoinRoom(roomCode.trim().toUpperCase(), playerName.trim(), setConnectionStatus);
         setLoading(false);
+        setConnectionStatus(null);
     };
 
     const handleBack = () => {
         setMode('menu');
         setPlayerName('');
         setRoomCode('');
+        setConnectionStatus(null);
     };
 
     return (
@@ -93,7 +99,8 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                                 className="input-field"
                                 maxLength={20}
                                 autoFocus
-                                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
+                                disabled={loading}
+                                onKeyDown={(e) => e.key === 'Enter' && !loading && handleCreate()}
                             />
                         </div>
                         <button
@@ -102,15 +109,22 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                             className="btn-primary w-full py-4"
                         >
                             {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
-                                    Creating...
+                                <span className="flex flex-col items-center justify-center gap-1">
+                                    <span className="flex items-center gap-2">
+                                        <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
+                                        {connectionStatus || 'Connecting...'}
+                                    </span>
                                 </span>
                             ) : 'Create Room'}
                         </button>
-                        <button onClick={handleBack} className="btn-secondary w-full py-3">
+                        <button onClick={handleBack} disabled={loading} className="btn-secondary w-full py-3">
                             Back
                         </button>
+                        {loading && connectionStatus && connectionStatus.includes('waking') && (
+                            <p className="text-zinc-500 text-xs text-center animate-fade-in">
+                                Free servers sleep after inactivity. This usually takes 30-60 seconds.
+                            </p>
+                        )}
                     </div>
                 )}
 
@@ -128,6 +142,7 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                                 className="input-field"
                                 maxLength={20}
                                 autoFocus
+                                disabled={loading}
                             />
                         </div>
                         <div>
@@ -141,7 +156,8 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                                 placeholder="XXXXX"
                                 className="input-field font-mono text-center text-2xl tracking-[0.4em] uppercase"
                                 maxLength={5}
-                                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                                disabled={loading}
+                                onKeyDown={(e) => e.key === 'Enter' && !loading && handleJoin()}
                             />
                         </div>
                         <button
@@ -150,15 +166,22 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                             className="btn-primary w-full py-4"
                         >
                             {loading ? (
-                                <span className="flex items-center justify-center gap-2">
-                                    <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
-                                    Joining...
+                                <span className="flex flex-col items-center justify-center gap-1">
+                                    <span className="flex items-center gap-2">
+                                        <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
+                                        {connectionStatus || 'Connecting...'}
+                                    </span>
                                 </span>
                             ) : 'Join Room'}
                         </button>
-                        <button onClick={handleBack} className="btn-secondary w-full py-3">
+                        <button onClick={handleBack} disabled={loading} className="btn-secondary w-full py-3">
                             Back
                         </button>
+                        {loading && connectionStatus && connectionStatus.includes('waking') && (
+                            <p className="text-zinc-500 text-xs text-center animate-fade-in">
+                                Free servers sleep after inactivity. This usually takes 30-60 seconds.
+                            </p>
+                        )}
                     </div>
                 )}
             </div>

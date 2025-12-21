@@ -1,8 +1,9 @@
 {
     "name": "@coup/client",
     "private": true,
-    "version": "2.0.1",
+    "version": "2.0.2",
     "type": "module",
+    "license": "MIT",
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
