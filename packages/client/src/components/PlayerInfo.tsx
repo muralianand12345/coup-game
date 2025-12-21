@@ -24,55 +24,77 @@ export const PlayerInfo: FC<PlayerInfoProps> = ({
         <div
             onClick={selectable && player.isAlive && !isYou ? onSelect : undefined}
             className={`
-        p-5 rounded-xl border transition-all duration-300
-        ${isCurrentTurn ? 'border-white bg-white/5 shadow-lg shadow-white/10' : 'border-coup-border bg-coup-card/50'}
-        ${!player.isAlive ? 'opacity-30' : ''}
-        ${!player.isConnected ? 'border-dashed opacity-50' : ''}
-        ${selectable && player.isAlive && !isYou ? 'cursor-pointer hover:border-coup-border-light hover:bg-coup-card-hover active:scale-98' : ''}
-      `}
+                relative p-5 rounded-2xl border transition-all duration-500
+                ${isCurrentTurn
+                    ? 'bg-zinc-900/80 border-amber-500/30 shadow-lg shadow-amber-500/5'
+                    : 'bg-zinc-900/40 border-zinc-800/50 hover:border-zinc-700/50'
+                }
+                ${!player.isAlive ? 'opacity-30' : ''}
+                ${!player.isConnected ? 'border-dashed' : ''}
+                ${selectable && player.isAlive && !isYou ? 'cursor-pointer hover:bg-zinc-900/60' : ''}
+            `}
         >
+            {isCurrentTurn && (
+                <div className="absolute -top-px left-1/2 -translate-x-1/2 w-16 h-px bg-gradient-to-r from-transparent via-amber-500 to-transparent" />
+            )}
+
             <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-2">
-                    {isCurrentTurn && <div className="w-2 h-2 rounded-full bg-white animate-pulse" />}
-                    <span className={`font-medium ${isYou ? 'text-white' : 'text-gray-400'}`}>
-                        {player.name}
-                        {isYou && ' (You)'}
-                    </span>
-                    {!player.isConnected && (
-                        <span className="text-[10px] text-gray-600">(disconnected)</span>
+                <div className="flex items-center gap-3">
+                    {isCurrentTurn && (
+                        <div className="status-indicator active" />
                     )}
+                    <div className={`
+                        w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold
+                        ${isYou ? 'bg-zinc-100 text-zinc-900' : 'bg-zinc-800 text-zinc-400'}
+                    `}>
+                        {player.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="flex flex-col">
+                        <span className={`font-medium text-sm ${isYou ? 'text-zinc-100' : 'text-zinc-400'}`}>
+                            {player.name}
+                            {isYou && <span className="text-zinc-500 ml-1">(You)</span>}
+                        </span>
+                        {!player.isConnected && (
+                            <span className="text-[10px] text-zinc-600">Disconnected</span>
+                        )}
+                    </div>
                 </div>
-                <div className="flex items-center gap-2 bg-coup-card px-3 py-1.5 rounded-lg border border-coup-border">
-                    <span className="text-yellow-400 text-lg">●</span>
-                    <span className="font-mono font-medium">{player.coins}</span>
+
+                <div className="coin-display">
+                    <div className="coin-icon">$</div>
+                    <span className="font-mono font-medium text-amber-400">{player.coins}</span>
                 </div>
             </div>
 
-            <div className="flex gap-2">
+            <div className="flex gap-2 justify-center">
                 {isYou ? (
                     player.cards.map((card, index) => (
-                        <div key={card.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
-                            <Card
-                                card={card}
-                                faceUp={true}
-                                small={true}
-                            />
+                        <div
+                            key={card.id}
+                            className="animate-card-enter"
+                            style={{ animationDelay: `${index * 0.1}s` }}
+                        >
+                            <Card card={card} faceUp={true} small={true} />
                         </div>
                     ))
                 ) : (
                     <>
                         {aliveCards.map((card, index) => (
-                            <div key={card.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                            <div
+                                key={card.id}
+                                className="animate-card-enter"
+                                style={{ animationDelay: `${index * 0.1}s` }}
+                            >
                                 <CardBack small={true} />
                             </div>
                         ))}
                         {deadCards.map((card, index) => (
-                            <div key={card.id} className="animate-fade-in-up" style={{ animationDelay: `${(aliveCards.length + index) * 100}ms` }}>
-                                <Card
-                                    card={card}
-                                    faceUp={true}
-                                    small={true}
-                                />
+                            <div
+                                key={card.id}
+                                className="animate-card-enter"
+                                style={{ animationDelay: `${(aliveCards.length + index) * 0.1}s` }}
+                            >
+                                <Card card={card} faceUp={true} small={true} />
                             </div>
                         ))}
                     </>

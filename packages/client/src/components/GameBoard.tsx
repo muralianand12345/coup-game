@@ -1,5 +1,5 @@
 import { FC } from 'react';
-import { GameState, GamePhase } from '@coup/shared';
+import { GameState, GamePhase, ChatMessage } from '@coup/shared';
 import { PlayerInfo } from './PlayerInfo';
 import { ActionButtons } from './ActionButtons';
 import { ResponsePanel } from './ResponsePanel';
@@ -8,7 +8,6 @@ import { ExchangeModal } from './ExchangeModal';
 import { GameLog } from './GameLog';
 import { Chat } from './Chat';
 import { Card } from './Card';
-import { ChatMessage } from '@coup/shared';
 
 interface GameBoardProps {
     gameState: GameState;
@@ -50,8 +49,7 @@ export const GameBoard: FC<GameBoardProps> = ({
         gameState.playerLosingInfluence === playerId;
 
     const needToExchange =
-        gameState.phase === GamePhase.EXCHANGE_SELECT &&
-        isMyTurn;
+        gameState.phase === GamePhase.EXCHANGE_SELECT && isMyTurn;
 
     const showResponsePanel =
         (gameState.phase === GamePhase.ACTION_RESPONSE ||
@@ -62,16 +60,31 @@ export const GameBoard: FC<GameBoardProps> = ({
 
     if (gameState.phase === GamePhase.GAME_OVER) {
         const winner = gameState.players.find(p => p.id === gameState.winner);
+        const isWinner = winner?.id === playerId;
+
         return (
-            <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
-                <div className="glass-panel p-12 max-w-md w-full text-center animate-scale-in">
-                    <div className="text-6xl mb-6">🏆</div>
-                    <h1 className="text-4xl font-bold mb-4 tracking-tight">GAME OVER</h1>
-                    <p className="text-2xl mb-8 text-gray-400">
-                        {winner?.id === playerId ? (
-                            <span className="text-white">You Win!</span>
+            <div className="page-container min-h-screen flex items-center justify-center p-6">
+                <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                    {isWinner && (
+                        <>
+                            <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl animate-pulse" />
+                            <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '0.5s' }} />
+                        </>
+                    )}
+                </div>
+
+                <div className="glass-panel p-12 max-w-md w-full text-center animate-scale-in relative z-10">
+                    <div className="text-6xl mb-6 animate-float">
+                        {isWinner ? '👑' : '💀'}
+                    </div>
+                    <h1 className="text-3xl font-bold mb-4 tracking-tight">Game Over</h1>
+                    <p className="text-xl mb-8">
+                        {isWinner ? (
+                            <span className="text-amber-400">You Win!</span>
                         ) : (
-                            <span><span className="text-white">{winner?.name}</span> Wins</span>
+                            <span className="text-zinc-400">
+                                <span className="text-zinc-100">{winner?.name}</span> Wins
+                            </span>
                         )}
                     </p>
                     <button onClick={onLeaveRoom} className="btn-primary w-full py-4">
@@ -83,7 +96,7 @@ export const GameBoard: FC<GameBoardProps> = ({
     }
 
     return (
-        <div className="min-h-screen animate-fade-in">
+        <div className="page-container min-h-screen">
             {needToLoseInfluence && myPlayer && (
                 <LoseInfluenceModal
                     cards={myPlayer.cards}
@@ -99,67 +112,82 @@ export const GameBoard: FC<GameBoardProps> = ({
                 />
             )}
 
-            <div className="border-b border-coup-border bg-coup-card/80 backdrop-blur-sm sticky top-0 z-10">
+            <header className="sticky top-0 z-10 border-b border-zinc-800/50 bg-zinc-950/80 backdrop-blur-xl">
                 <div className="max-w-7xl mx-auto px-4 py-4">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center gap-6">
-                            <div>
-                                <h1 className="text-2xl font-bold tracking-tight">COUP</h1>
-                            </div>
-                            <div className="h-8 w-px bg-coup-border" />
+                            <h1 className="text-xl font-bold tracking-tight">COUP</h1>
+                            <div className="h-6 w-px bg-zinc-800" />
                             <div className="flex flex-col">
-                                <span className="text-[10px] text-gray-600 uppercase tracking-wide">Room</span>
-                                <span className="font-mono text-sm text-white">{gameState.roomId}</span>
+                                <span className="text-[10px] text-zinc-600 uppercase tracking-wider">Room</span>
+                                <span className="font-mono text-sm text-zinc-300">{gameState.roomId}</span>
                             </div>
                         </div>
                         <button onClick={onLeaveRoom} className="btn-secondary text-xs py-2 px-4">
-                            Leave Game
+                            Leave
                         </button>
                     </div>
                 </div>
-            </div>
+            </header>
 
-            <div className="max-w-7xl mx-auto p-4">
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                    <div className="lg:col-span-2 space-y-6">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {otherPlayers.map((player, index) => (
-                                <div key={player.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
-                                    <PlayerInfo
-                                        player={player}
-                                        isCurrentTurn={currentPlayer.id === player.id}
-                                        isYou={false}
-                                    />
-                                </div>
-                            ))}
-                        </div>
+            <main className="max-w-7xl mx-auto p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <div className="lg:col-span-3 space-y-3">
+                        {otherPlayers.map((player, index) => (
+                            <div
+                                key={player.id}
+                                className="animate-slide-in-left"
+                                style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                                <PlayerInfo
+                                    player={player}
+                                    isCurrentTurn={currentPlayer.id === player.id}
+                                    isYou={false}
+                                />
+                            </div>
+                        ))}
+                    </div>
 
-                        <div className="glass-panel p-6 glow-border animate-fade-in-up">
+                    <div className="lg:col-span-6 space-y-6">
+                        <div className="glass-panel p-6 animate-fade-in-up" style={{ animationDelay: '0.1s' }}>
                             <div className="flex items-center justify-between mb-5">
-                                <span className="text-sm text-gray-500 uppercase tracking-wide">Your Hand</span>
-                                <div className="flex items-center gap-2 bg-coup-card px-4 py-2 rounded-lg border border-coup-border">
-                                    <span className="text-yellow-400 text-lg">●</span>
-                                    <span className="font-mono text-xl font-medium">{myPlayer?.coins}</span>
+                                <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">Your Hand</span>
+                                <div className="coin-display">
+                                    <div className="coin-icon">$</div>
+                                    <span className="font-mono text-lg font-medium text-amber-400">{myPlayer?.coins}</span>
                                 </div>
                             </div>
                             <div className="flex gap-4 justify-center">
                                 {myPlayer?.cards.map((card, index) => (
-                                    <div key={card.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                                    <div
+                                        key={card.id}
+                                        className="animate-card-enter"
+                                        style={{ animationDelay: `${0.15 + index * 0.1}s` }}
+                                    >
                                         <Card card={card} faceUp={true} />
                                     </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="text-center p-4 rounded-xl bg-coup-card border border-coup-border">
+                        <div
+                            className={`
+                                text-center p-4 rounded-xl border transition-all duration-500 animate-fade-in-up
+                                ${isMyTurn
+                                    ? 'bg-emerald-500/5 border-emerald-500/20'
+                                    : 'bg-zinc-900/40 border-zinc-800/50'
+                                }
+                            `}
+                            style={{ animationDelay: '0.2s' }}
+                        >
                             {isMyTurn ? (
                                 <div className="flex items-center justify-center gap-2">
-                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
-                                    <span className="text-green-400 font-medium">Your Turn</span>
+                                    <div className="status-indicator active" />
+                                    <span className="text-emerald-400 font-medium">Your Turn</span>
                                 </div>
                             ) : (
-                                <span className="text-gray-500">
-                                    Waiting for <span className="text-white font-medium">{currentPlayer.name}</span>
+                                <span className="text-zinc-500">
+                                    Waiting for <span className="text-zinc-300 font-medium">{currentPlayer.name}</span>
                                 </span>
                             )}
                         </div>
@@ -183,16 +211,20 @@ export const GameBoard: FC<GameBoardProps> = ({
                         ) : null}
                     </div>
 
-                    <div className="space-y-4">
-                        <GameLog logs={gameState.gameLog} />
-                        <Chat
-                            messages={chatMessages}
-                            onSendMessage={onSendChat}
-                            playerId={playerId}
-                        />
+                    <div className="lg:col-span-3 space-y-4">
+                        <div className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
+                            <GameLog logs={gameState.gameLog} />
+                        </div>
+                        <div className="animate-slide-in-right" style={{ animationDelay: '0.2s' }}>
+                            <Chat
+                                messages={chatMessages}
+                                onSendMessage={onSendChat}
+                                playerId={playerId}
+                            />
+                        </div>
                     </div>
                 </div>
-            </div>
+            </main>
         </div>
     );
 };

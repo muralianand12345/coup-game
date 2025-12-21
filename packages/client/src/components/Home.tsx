@@ -26,22 +26,38 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
         setLoading(false);
     };
 
+    const handleBack = () => {
+        setMode('menu');
+        setPlayerName('');
+        setRoomCode('');
+    };
+
     return (
-        <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
-            <div className="glass-panel p-10 max-w-md w-full animate-scale-in">
-                <div className="text-center mb-10">
-                    <h1 className="text-6xl font-bold mb-3 tracking-tight">COUP</h1>
-                    <p className="text-gray-500 text-sm tracking-wide">ONLINE MULTIPLAYER</p>
+        <div className="page-container min-h-screen flex items-center justify-center p-6">
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="glass-panel p-10 max-w-md w-full animate-scale-in relative z-10">
+                <div className="text-center mb-12">
+                    <div className="inline-flex items-center gap-3 mb-4">
+                        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center animate-float">
+                            <span className="text-2xl">👑</span>
+                        </div>
+                    </div>
+                    <h1 className="text-5xl font-bold tracking-tight mb-2">COUP</h1>
+                    <p className="text-zinc-500 text-sm tracking-widest uppercase">Bluff · Deceive · Survive</p>
                 </div>
 
                 {error && (
-                    <div className="bg-red-950/50 border border-red-800/50 text-red-400 p-4 rounded-xl mb-6 text-center text-sm animate-fade-in-up">
-                        {error}
+                    <div className="mb-6 p-4 rounded-xl bg-red-500/10 border border-red-500/20 animate-fade-in-down">
+                        <p className="text-red-400 text-sm text-center">{error}</p>
                     </div>
                 )}
 
                 {mode === 'menu' && (
-                    <div className="space-y-3 animate-fade-in-up">
+                    <div className="space-y-4 animate-fade-in-up">
                         <button
                             onClick={() => setMode('create')}
                             className="btn-primary w-full py-4 text-base"
@@ -54,21 +70,30 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                         >
                             Join Room
                         </button>
+
+                        <div className="pt-8 flex items-center gap-4">
+                            <div className="flex-1 h-px bg-zinc-800" />
+                            <span className="text-zinc-600 text-xs uppercase tracking-wider">2-6 Players</span>
+                            <div className="flex-1 h-px bg-zinc-800" />
+                        </div>
                     </div>
                 )}
 
                 {mode === 'create' && (
-                    <div className="space-y-5 animate-fade-in-up">
+                    <div className="space-y-6 animate-fade-in-up">
                         <div>
-                            <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">Your Name</label>
+                            <label className="block text-xs text-zinc-500 mb-2 uppercase tracking-wider font-medium">
+                                Your Name
+                            </label>
                             <input
                                 type="text"
                                 value={playerName}
                                 onChange={(e) => setPlayerName(e.target.value)}
                                 placeholder="Enter your name"
-                                className="input-field w-full"
+                                className="input-field"
                                 maxLength={20}
                                 autoFocus
+                                onKeyDown={(e) => e.key === 'Enter' && handleCreate()}
                             />
                         </div>
                         <button
@@ -76,40 +101,47 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                             disabled={!playerName.trim() || loading}
                             className="btn-primary w-full py-4"
                         >
-                            {loading ? 'Creating...' : 'Create Room'}
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
+                                    Creating...
+                                </span>
+                            ) : 'Create Room'}
                         </button>
-                        <button
-                            onClick={() => setMode('menu')}
-                            className="btn-secondary w-full py-3"
-                        >
+                        <button onClick={handleBack} className="btn-secondary w-full py-3">
                             Back
                         </button>
                     </div>
                 )}
 
                 {mode === 'join' && (
-                    <div className="space-y-5 animate-fade-in-up">
+                    <div className="space-y-6 animate-fade-in-up">
                         <div>
-                            <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">Your Name</label>
+                            <label className="block text-xs text-zinc-500 mb-2 uppercase tracking-wider font-medium">
+                                Your Name
+                            </label>
                             <input
                                 type="text"
                                 value={playerName}
                                 onChange={(e) => setPlayerName(e.target.value)}
                                 placeholder="Enter your name"
-                                className="input-field w-full"
+                                className="input-field"
                                 maxLength={20}
                                 autoFocus
                             />
                         </div>
                         <div>
-                            <label className="block text-xs text-gray-500 mb-2 uppercase tracking-wide">Room Code</label>
+                            <label className="block text-xs text-zinc-500 mb-2 uppercase tracking-wider font-medium">
+                                Room Code
+                            </label>
                             <input
                                 type="text"
                                 value={roomCode}
                                 onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
                                 placeholder="XXXXX"
-                                className="input-field w-full font-mono text-center text-2xl tracking-[0.5em] uppercase"
+                                className="input-field font-mono text-center text-2xl tracking-[0.4em] uppercase"
                                 maxLength={5}
+                                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
                             />
                         </div>
                         <button
@@ -117,21 +149,18 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                             disabled={!playerName.trim() || !roomCode.trim() || loading}
                             className="btn-primary w-full py-4"
                         >
-                            {loading ? 'Joining...' : 'Join Room'}
+                            {loading ? (
+                                <span className="flex items-center justify-center gap-2">
+                                    <span className="w-4 h-4 border-2 border-zinc-900/30 border-t-zinc-900 rounded-full animate-spin" />
+                                    Joining...
+                                </span>
+                            ) : 'Join Room'}
                         </button>
-                        <button
-                            onClick={() => setMode('menu')}
-                            className="btn-secondary w-full py-3"
-                        >
+                        <button onClick={handleBack} className="btn-secondary w-full py-3">
                             Back
                         </button>
                     </div>
                 )}
-
-                <div className="mt-10 text-center text-xs text-gray-600 space-y-1">
-                    <p>2-6 Players</p>
-                    <p className="text-gray-700">Bluff • Deceive • Survive</p>
-                </div>
             </div>
         </div>
     );

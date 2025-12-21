@@ -8,6 +8,16 @@ interface ActionButtonsProps {
     disabled: boolean;
 }
 
+const actionConfig = {
+    [ActionType.INCOME]: { label: 'Income', desc: '+1 coin', color: 'zinc' },
+    [ActionType.FOREIGN_AID]: { label: 'Foreign Aid', desc: '+2 coins', color: 'zinc' },
+    [ActionType.COUP]: { label: 'Coup', desc: '-7 coins', color: 'red' },
+    [ActionType.TAX]: { label: 'Tax', desc: 'Duke · +3', color: 'violet' },
+    [ActionType.ASSASSINATE]: { label: 'Assassinate', desc: 'Assassin · -3', color: 'zinc' },
+    [ActionType.STEAL]: { label: 'Steal', desc: 'Captain · +2', color: 'sky' },
+    [ActionType.EXCHANGE]: { label: 'Exchange', desc: 'Ambassador', color: 'emerald' },
+};
+
 export const ActionButtons: FC<ActionButtonsProps> = ({
     myPlayer,
     otherPlayers,
@@ -19,7 +29,6 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
     const mustCoup = myPlayer.coins >= 10;
     const canAffordCoup = myPlayer.coins >= 7;
     const canAffordAssassinate = myPlayer.coins >= 3;
-
     const aliveOthers = otherPlayers.filter(p => p.isAlive);
 
     const handleActionClick = (action: ActionType) => {
@@ -39,29 +48,38 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
     };
 
     if (selectingTarget) {
+        const config = actionConfig[selectingTarget];
         return (
-            <div className="glass-panel p-6 space-y-4 animate-scale-in">
-                <p className="text-center text-gray-400 text-sm uppercase tracking-wide">
-                    Select target for <span className="text-white font-medium">{selectingTarget}</span>
-                </p>
-                <div className="flex flex-wrap gap-2 justify-center">
-                    {aliveOthers.map((player) => (
-                        <button
-                            key={player.id}
-                            onClick={() => handleTargetSelect(player.id)}
-                            className="btn-primary"
-                            disabled={
-                                (selectingTarget === ActionType.STEAL && player.coins === 0)
-                            }
-                        >
-                            {player.name}
-                            {selectingTarget === ActionType.STEAL && ` (${player.coins}●)`}
-                        </button>
-                    ))}
+            <div className="glass-panel p-6 animate-scale-in">
+                <div className="text-center mb-6">
+                    <p className="text-zinc-500 text-sm">
+                        Select target for <span className="text-zinc-100 font-medium">{config.label}</span>
+                    </p>
                 </div>
+
+                <div className="grid grid-cols-2 gap-3 mb-4">
+                    {aliveOthers.map((player, index) => {
+                        const isDisabled = selectingTarget === ActionType.STEAL && player.coins === 0;
+                        return (
+                            <button
+                                key={player.id}
+                                onClick={() => handleTargetSelect(player.id)}
+                                disabled={isDisabled}
+                                className="btn-action animate-fade-in-up"
+                                style={{ animationDelay: `${index * 0.05}s` }}
+                            >
+                                <span className="font-medium">{player.name}</span>
+                                {selectingTarget === ActionType.STEAL && (
+                                    <span className="text-xs text-amber-400">{player.coins} coins</span>
+                                )}
+                            </button>
+                        );
+                    })}
+                </div>
+
                 <button
                     onClick={() => setSelectingTarget(null)}
-                    className="btn-secondary w-full"
+                    className="btn-secondary w-full py-3"
                 >
                     Cancel
                 </button>
@@ -70,82 +88,88 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
     }
 
     return (
-        <div className="glass-panel p-6 space-y-5 animate-fade-in-up">
+        <div className="glass-panel p-6 animate-fade-in-up">
             {mustCoup && (
-                <div className="text-center p-3 bg-yellow-500/10 border border-yellow-500/30 rounded-xl">
-                    <span className="text-yellow-400 text-sm font-medium">⚠️ You must Coup (10+ coins)</span>
+                <div className="mb-5 p-3 rounded-xl bg-amber-500/10 border border-amber-500/20 text-center">
+                    <span className="text-amber-400 text-sm">
+                        ⚠️ You have 10+ coins — you must Coup
+                    </span>
                 </div>
             )}
 
-            <div>
-                <h3 className="text-xs text-gray-600 uppercase tracking-wide mb-3">Basic Actions</h3>
+            <div className="mb-6">
+                <h3 className="text-xs text-zinc-600 uppercase tracking-wider mb-3 font-medium">
+                    Basic Actions
+                </h3>
                 <div className="grid grid-cols-3 gap-3">
                     <button
                         onClick={() => handleActionClick(ActionType.INCOME)}
                         disabled={disabled || mustCoup}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1"
+                        className="btn-action"
                     >
                         <span className="font-medium">Income</span>
-                        <span className="text-xs text-gray-500">+1 coin</span>
+                        <span className="text-xs text-zinc-500">+1 coin</span>
                     </button>
 
                     <button
                         onClick={() => handleActionClick(ActionType.FOREIGN_AID)}
                         disabled={disabled || mustCoup}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1"
+                        className="btn-action"
                     >
                         <span className="font-medium">Foreign Aid</span>
-                        <span className="text-xs text-gray-500">+2 coins</span>
+                        <span className="text-xs text-zinc-500">+2 coins</span>
                     </button>
 
                     <button
                         onClick={() => handleActionClick(ActionType.COUP)}
                         disabled={disabled || !canAffordCoup}
-                        className="btn-danger py-4 flex flex-col items-center justify-center gap-1"
+                        className="btn-action border-red-500/30 hover:border-red-500/50"
                     >
-                        <span className="font-medium">Coup</span>
-                        <span className="text-xs opacity-90">-7 coins</span>
+                        <span className="font-medium text-red-400">Coup</span>
+                        <span className="text-xs text-red-400/70">-7 coins</span>
                     </button>
                 </div>
             </div>
 
             <div>
-                <h3 className="text-xs text-gray-600 uppercase tracking-wide mb-3">Character Actions</h3>
+                <h3 className="text-xs text-zinc-600 uppercase tracking-wider mb-3 font-medium">
+                    Character Actions
+                </h3>
                 <div className="grid grid-cols-2 gap-3">
                     <button
                         onClick={() => handleActionClick(ActionType.TAX)}
                         disabled={disabled || mustCoup}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1 border-purple-500/50 text-purple-400 hover:bg-purple-500/10 hover:border-purple-500"
+                        className="btn-action border-violet-500/30 hover:border-violet-500/50"
                     >
-                        <span className="font-medium">Tax</span>
-                        <span className="text-[10px] text-gray-500">Duke • +3 coins</span>
+                        <span className="font-medium text-violet-400">Tax</span>
+                        <span className="text-xs text-zinc-500">Duke · +3 coins</span>
                     </button>
 
                     <button
                         onClick={() => handleActionClick(ActionType.ASSASSINATE)}
                         disabled={disabled || mustCoup || !canAffordAssassinate}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1 border-gray-600/50 text-gray-400 hover:bg-gray-600/10 hover:border-gray-600"
+                        className="btn-action border-zinc-600/30 hover:border-zinc-500/50"
                     >
-                        <span className="font-medium">Assassinate</span>
-                        <span className="text-[10px] text-gray-500">Assassin • -3 coins</span>
+                        <span className="font-medium text-zinc-300">Assassinate</span>
+                        <span className="text-xs text-zinc-500">Assassin · -3 coins</span>
                     </button>
 
                     <button
                         onClick={() => handleActionClick(ActionType.STEAL)}
                         disabled={disabled || mustCoup || aliveOthers.every(p => p.coins === 0)}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1 border-blue-500/50 text-blue-400 hover:bg-blue-500/10 hover:border-blue-500"
+                        className="btn-action border-sky-500/30 hover:border-sky-500/50"
                     >
-                        <span className="font-medium">Steal</span>
-                        <span className="text-[10px] text-gray-500">Captain • Take 2</span>
+                        <span className="font-medium text-sky-400">Steal</span>
+                        <span className="text-xs text-zinc-500">Captain · Take 2</span>
                     </button>
 
                     <button
                         onClick={() => handleActionClick(ActionType.EXCHANGE)}
                         disabled={disabled || mustCoup}
-                        className="btn-secondary py-4 flex flex-col items-center justify-center gap-1 border-green-500/50 text-green-400 hover:bg-green-500/10 hover:border-green-500"
+                        className="btn-action border-emerald-500/30 hover:border-emerald-500/50"
                     >
-                        <span className="font-medium">Exchange</span>
-                        <span className="text-[10px] text-gray-500">Ambassador • Swap</span>
+                        <span className="font-medium text-emerald-400">Exchange</span>
+                        <span className="text-xs text-zinc-500">Ambassador · Swap</span>
                     </button>
                 </div>
             </div>
