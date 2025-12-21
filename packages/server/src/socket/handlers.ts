@@ -179,9 +179,13 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 			} else if (state.phase === GamePhase.BLOCK_RESPONSE && state.pendingBlock) {
 				const challengeSuccess = GameEngine.handleChallenge(state, playerId, state.pendingBlock.claimedCard, state.pendingBlock.playerId);
 
+				// If the challenge against the block is successful, the blocker must
+				// immediately lose influence. Keep the phase as CHALLENGE_RESOLUTION
+				// (set inside handleChallenge) and clear the pending block. Do NOT
+				// revert to ACTION_RESPONSE here, which caused a frozen timer and
+				// incorrect UI state.
 				if (challengeSuccess) {
 					state.pendingBlock = null;
-					if (state.pendingAction) state.phase = GamePhase.ACTION_RESPONSE;
 				}
 			}
 
@@ -257,6 +261,8 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 					} else if (state.pendingBlock && state.challengerId === playerId) {
 						GameEngine.addLogEntry(state, 'Block successful - action canceled', 'block');
 						GameEngine.advanceTurn(state);
+					} else if (state.pendingAction && !state.pendingBlock) {
+						GameEngine.executeAction(state);
 					} else {
 						state.pendingAction = null;
 						state.pendingBlock = null;

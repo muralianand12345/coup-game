@@ -63,13 +63,18 @@ export const GameBoard: FC<GameBoardProps> = ({
     if (gameState.phase === GamePhase.GAME_OVER) {
         const winner = gameState.players.find(p => p.id === gameState.winner);
         return (
-            <div className="min-h-screen flex items-center justify-center p-4">
-                <div className="bg-coup-card border-2 border-coup-border rounded-lg p-8 max-w-md w-full text-center">
-                    <h1 className="text-3xl font-bold mb-4">Game Over!</h1>
-                    <p className="text-xl mb-2">
-                        {winner?.id === playerId ? '🎉 You Win! 🎉' : `${winner?.name} Wins!`}
+            <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
+                <div className="glass-panel p-12 max-w-md w-full text-center animate-scale-in">
+                    <div className="text-6xl mb-6">🏆</div>
+                    <h1 className="text-4xl font-bold mb-4 tracking-tight">GAME OVER</h1>
+                    <p className="text-2xl mb-8 text-gray-400">
+                        {winner?.id === playerId ? (
+                            <span className="text-white">You Win!</span>
+                        ) : (
+                            <span><span className="text-white">{winner?.name}</span> Wins</span>
+                        )}
                     </p>
-                    <button onClick={onLeaveRoom} className="btn-primary mt-6">
+                    <button onClick={onLeaveRoom} className="btn-primary w-full py-4">
                         Leave Game
                     </button>
                 </div>
@@ -78,7 +83,7 @@ export const GameBoard: FC<GameBoardProps> = ({
     }
 
     return (
-        <div className="min-h-screen p-4">
+        <div className="min-h-screen animate-fade-in">
             {needToLoseInfluence && myPlayer && (
                 <LoseInfluenceModal
                     cards={myPlayer.cards}
@@ -94,51 +99,67 @@ export const GameBoard: FC<GameBoardProps> = ({
                 />
             )}
 
-            <div className="max-w-6xl mx-auto">
-                <div className="flex justify-between items-center mb-4">
-                    <div className="text-sm text-gray-400">
-                        Room: <span className="font-mono">{gameState.roomId}</span>
+            <div className="border-b border-coup-border bg-coup-card/80 backdrop-blur-sm sticky top-0 z-10">
+                <div className="max-w-7xl mx-auto px-4 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-6">
+                            <div>
+                                <h1 className="text-2xl font-bold tracking-tight">COUP</h1>
+                            </div>
+                            <div className="h-8 w-px bg-coup-border" />
+                            <div className="flex flex-col">
+                                <span className="text-[10px] text-gray-600 uppercase tracking-wide">Room</span>
+                                <span className="font-mono text-sm text-white">{gameState.roomId}</span>
+                            </div>
+                        </div>
+                        <button onClick={onLeaveRoom} className="btn-secondary text-xs py-2 px-4">
+                            Leave Game
+                        </button>
                     </div>
-                    <button onClick={onLeaveRoom} className="btn-secondary text-sm py-1 px-3">
-                        Leave
-                    </button>
                 </div>
+            </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-                    <div className="lg:col-span-2 space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                            {otherPlayers.map((player) => (
-                                <PlayerInfo
-                                    key={player.id}
-                                    player={player}
-                                    isCurrentTurn={currentPlayer.id === player.id}
-                                    isYou={false}
-                                />
+            <div className="max-w-7xl mx-auto p-4">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div className="lg:col-span-2 space-y-6">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {otherPlayers.map((player, index) => (
+                                <div key={player.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 50}ms` }}>
+                                    <PlayerInfo
+                                        player={player}
+                                        isCurrentTurn={currentPlayer.id === player.id}
+                                        isYou={false}
+                                    />
+                                </div>
                             ))}
                         </div>
 
-                        <div className="bg-coup-card border-2 border-white rounded-lg p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="font-bold text-yellow-400">Your Hand</span>
-                                <div className="flex items-center gap-1">
-                                    <span className="text-yellow-400">●</span>
-                                    <span className="font-mono text-xl">{myPlayer?.coins}</span>
-                                    <span className="text-gray-400 text-sm ml-1">coins</span>
+                        <div className="glass-panel p-6 glow-border animate-fade-in-up">
+                            <div className="flex items-center justify-between mb-5">
+                                <span className="text-sm text-gray-500 uppercase tracking-wide">Your Hand</span>
+                                <div className="flex items-center gap-2 bg-coup-card px-4 py-2 rounded-lg border border-coup-border">
+                                    <span className="text-yellow-400 text-lg">●</span>
+                                    <span className="font-mono text-xl font-medium">{myPlayer?.coins}</span>
                                 </div>
                             </div>
                             <div className="flex gap-4 justify-center">
-                                {myPlayer?.cards.map((card) => (
-                                    <Card key={card.id} card={card} faceUp={true} />
+                                {myPlayer?.cards.map((card, index) => (
+                                    <div key={card.id} className="animate-fade-in-up" style={{ animationDelay: `${index * 100}ms` }}>
+                                        <Card card={card} faceUp={true} />
+                                    </div>
                                 ))}
                             </div>
                         </div>
 
-                        <div className="text-center p-2 bg-coup-bg rounded">
+                        <div className="text-center p-4 rounded-xl bg-coup-card border border-coup-border">
                             {isMyTurn ? (
-                                <span className="text-green-400 font-bold">Your Turn!</span>
+                                <div className="flex items-center justify-center gap-2">
+                                    <div className="w-2 h-2 rounded-full bg-green-400 animate-pulse" />
+                                    <span className="text-green-400 font-medium">Your Turn</span>
+                                </div>
                             ) : (
-                                <span className="text-gray-400">
-                                    Waiting for <span className="text-white">{currentPlayer.name}</span>...
+                                <span className="text-gray-500">
+                                    Waiting for <span className="text-white font-medium">{currentPlayer.name}</span>
                                 </span>
                             )}
                         </div>

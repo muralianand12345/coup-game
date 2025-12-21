@@ -36,9 +36,9 @@ export const Card: FC<CardProps> = ({
         return (
             <div
                 onClick={onClick}
-                className={`${baseClasses} rounded-lg border-2 border-coup-border bg-coup-card flex items-center justify-center cursor-pointer hover:border-white transition-all ${selected ? 'ring-2 ring-white' : ''}`}
+                className={`${baseClasses} rounded-xl border-2 border-coup-border bg-coup-card flex items-center justify-center cursor-pointer hover:border-coup-border-light hover:bg-coup-card-hover transition-all duration-300 active:scale-95 ${selected ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-105' : ''}`}
             >
-                <div className="text-2xl opacity-30">?</div>
+                <div className="w-8 h-8 border-2 border-coup-border rotate-45 opacity-30 transition-transform group-hover:rotate-90" />
             </div>
         );
     }
@@ -46,25 +46,26 @@ export const Card: FC<CardProps> = ({
     return (
         <div
             onClick={onClick}
-            className={`${baseClasses} rounded-lg border-2 flex flex-col items-center justify-between p-2 cursor-pointer transition-all ${card?.isRevealed ? 'opacity-50' : ''} ${selected ? 'ring-2 ring-white ring-offset-2 ring-offset-black' : ''}`}
+            className={`${baseClasses} rounded-xl border-2 flex flex-col items-center justify-between p-2 cursor-pointer transition-all duration-300 shadow-lg hover:shadow-xl ${card?.isRevealed ? 'opacity-40 grayscale' : 'hover:scale-105 active:scale-95'} ${selected ? 'ring-2 ring-white ring-offset-2 ring-offset-black scale-105' : ''}`}
             style={{
                 borderColor: color,
                 backgroundColor: 'white',
+                boxShadow: card?.isRevealed ? 'none' : `0 4px 20px ${color}20`,
             }}
         >
             <div
-                className="text-3xl"
+                className="text-3xl transition-transform duration-300"
                 style={{ filter: card?.isRevealed ? 'grayscale(1)' : 'none' }}
             >
                 {info?.icon}
             </div>
             <div
-                className="font-bold text-center"
+                className="font-bold text-center tracking-tight"
                 style={{ color }}
             >
                 {info?.name}
             </div>
-            <div className="text-[10px] text-gray-600 text-center leading-tight">
+            <div className="text-[9px] text-gray-600 text-center leading-tight">
                 {small ? '' : info?.ability}
             </div>
         </div>
@@ -81,8 +82,8 @@ export const CardBack: FC<CardBackProps> = ({ small = false }) => {
         : 'w-24 h-36';
 
     return (
-        <div className={`${baseClasses} rounded-lg border-2 border-coup-border bg-coup-card flex items-center justify-center`}>
-            <div className="w-8 h-8 border-2 border-coup-border rotate-45" />
+        <div className={`${baseClasses} rounded-xl border-2 border-coup-border bg-coup-card flex items-center justify-center hover:border-coup-border-light transition-all duration-300`}>
+            <div className="w-8 h-8 border-2 border-coup-border-light rotate-45" />
         </div>
     );
 };

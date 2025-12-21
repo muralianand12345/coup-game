@@ -30,48 +30,59 @@ export const Lobby: FC<LobbyProps> = ({
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center p-4">
-            <div className="bg-coup-card border-2 border-coup-border rounded-lg p-6 max-w-md w-full">
-                <div className="text-center mb-6">
-                    <h1 className="text-2xl font-bold mb-2">Game Lobby</h1>
+        <div className="min-h-screen flex items-center justify-center p-4 animate-fade-in">
+            <div className="glass-panel p-8 max-w-md w-full animate-scale-in">
+                <div className="text-center mb-8">
+                    <h1 className="text-3xl font-bold mb-4 tracking-tight">GAME LOBBY</h1>
                     <div className="flex items-center justify-center gap-2">
-                        <span className="text-gray-400">Room Code:</span>
-                        <button
-                            onClick={copyRoomCode}
-                            className="font-mono text-xl bg-coup-bg px-3 py-1 rounded border border-coup-border hover:border-white transition-colors"
-                        >
-                            {room.id}
-                        </button>
+                        <span className="text-xs text-gray-600 uppercase tracking-wide">Room Code</span>
                     </div>
-                    {copied && <p className="text-green-400 text-sm mt-1">Copied!</p>}
+                    <button
+                        onClick={copyRoomCode}
+                        className="font-mono text-3xl tracking-wider mt-2 px-4 py-2 rounded-xl bg-coup-card-hover border border-coup-border hover:border-white transition-all active:scale-95"
+                    >
+                        {room.id}
+                    </button>
+                    {copied && (
+                        <p className="text-green-400 text-xs mt-2 animate-fade-in">
+                            ✓ Copied to clipboard
+                        </p>
+                    )}
                 </div>
 
-                <div className="space-y-3 mb-6">
-                    <h2 className="text-sm font-bold text-gray-400">
-                        Players ({room.players.length}/{room.maxPlayers})
-                    </h2>
-                    {room.players.map((player) => (
+                <div className="space-y-3 mb-8">
+                    <div className="flex items-center justify-between mb-4">
+                        <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wide">
+                            Players
+                        </h2>
+                        <span className="text-xs text-gray-600">
+                            {room.players.length}/{room.maxPlayers}
+                        </span>
+                    </div>
+                    {room.players.map((player, index) => (
                         <div
                             key={player.id}
-                            className="flex items-center justify-between p-3 bg-coup-bg rounded border border-coup-border"
+                            className="flex items-center justify-between p-4 bg-coup-card-hover rounded-xl border border-coup-border hover:border-coup-border-light transition-all animate-fade-in-up"
+                            style={{ animationDelay: `${index * 50}ms` }}
                         >
-                            <div className="flex items-center gap-2">
-                                <span className={player.id === playerId ? 'text-yellow-400' : ''}>
+                            <div className="flex items-center gap-3">
+                                <div className="w-2 h-2 rounded-full bg-white/30" />
+                                <span className={`font-medium ${player.id === playerId ? 'text-white' : 'text-gray-400'}`}>
                                     {player.name}
                                 </span>
                                 {player.id === room.hostId && (
-                                    <span className="text-xs bg-white text-black px-2 py-0.5 rounded">
+                                    <span className="text-[10px] bg-white text-black px-2 py-1 rounded-md font-medium">
                                         HOST
                                     </span>
                                 )}
                             </div>
                             <div>
                                 {player.id === room.hostId ? (
-                                    <span className="text-gray-500 text-sm">-</span>
+                                    <span className="text-gray-700 text-sm">—</span>
                                 ) : player.isReady ? (
-                                    <span className="text-green-400">Ready ✓</span>
+                                    <span className="text-green-400 text-sm font-medium">✓ Ready</span>
                                 ) : (
-                                    <span className="text-gray-500">Not Ready</span>
+                                    <span className="text-gray-600 text-sm">Waiting</span>
                                 )}
                             </div>
                         </div>
@@ -83,10 +94,10 @@ export const Lobby: FC<LobbyProps> = ({
                         <button
                             onClick={onStartGame}
                             disabled={!canStart}
-                            className="btn-primary w-full"
+                            className="btn-primary w-full py-4"
                         >
                             {room.players.length < MIN_PLAYERS
-                                ? `Need ${MIN_PLAYERS - room.players.length} more player(s)`
+                                ? `Need ${MIN_PLAYERS - room.players.length} more player${MIN_PLAYERS - room.players.length > 1 ? 's' : ''}`
                                 : !allReady
                                     ? 'Waiting for players...'
                                     : 'Start Game'}
@@ -94,13 +105,13 @@ export const Lobby: FC<LobbyProps> = ({
                     ) : (
                         <button
                             onClick={onToggleReady}
-                            className={`w-full ${myPlayer?.isReady ? 'btn-secondary' : 'btn-primary'}`}
+                            className={`w-full py-4 ${myPlayer?.isReady ? 'btn-secondary' : 'btn-primary'}`}
                         >
                             {myPlayer?.isReady ? 'Not Ready' : 'Ready'}
                         </button>
                     )}
 
-                    <button onClick={onLeaveRoom} className="btn-secondary w-full">
+                    <button onClick={onLeaveRoom} className="btn-secondary w-full py-3">
                         Leave Room
                     </button>
                 </div>

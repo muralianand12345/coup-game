@@ -5,12 +5,38 @@
 body {
     background-color: #0a0a0a;
     color: #ffffff;
-    font-family: system-ui, -apple-system, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+@layer base {
+    * {
+        @apply transition-colors duration-200;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #404040;
+        border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #505050;
+    }
 }
 
 @layer components {
     .card-base {
-        @apply relative w-24 h-36 rounded-lg border-2 flex flex-col items-center justify-center transition-all duration-200;
+        @apply relative w-24 h-36 rounded-xl border-2 flex flex-col items-center justify-center;
+        @apply transition-all duration-300 ease-out;
     }
 
     .card-front {
@@ -22,22 +48,51 @@ body {
     }
 
     .card-revealed {
-        @apply opacity-50;
+        @apply opacity-40 grayscale;
     }
 
     .btn-primary {
-        @apply px-4 py-2 bg-white text-black font-semibold rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+        @apply px-6 py-3 bg-white text-black font-medium rounded-xl;
+        @apply hover:bg-gray-100 active:scale-95;
+        @apply transition-all duration-200 ease-out;
+        @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100;
+        @apply shadow-lg shadow-white/10 hover:shadow-white/20;
     }
 
     .btn-secondary {
-        @apply px-4 py-2 bg-transparent border-2 border-white text-white font-semibold rounded-lg hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+        @apply px-6 py-3 bg-coup-card border border-coup-border-light text-white font-medium rounded-xl;
+        @apply hover:bg-coup-card-hover hover:border-white active:scale-95;
+        @apply transition-all duration-200 ease-out;
+        @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100;
     }
 
     .btn-danger {
-        @apply px-4 py-2 bg-red-600 text-white font-semibold rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+        @apply px-6 py-3 bg-red-600/90 text-white font-medium rounded-xl;
+        @apply hover:bg-red-600 active:scale-95;
+        @apply transition-all duration-200 ease-out;
+        @apply disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100;
+        @apply shadow-lg shadow-red-600/20;
     }
 
     .input-field {
-        @apply px-4 py-2 bg-coup-card border-2 border-coup-border rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-white transition-colors;
+        @apply px-4 py-3 bg-coup-card border border-coup-border rounded-xl;
+        @apply text-white placeholder-gray-600;
+        @apply focus:outline-none focus:border-coup-border-light focus:bg-coup-card-hover;
+        @apply transition-all duration-200;
+    }
+
+    .glass-panel {
+        @apply bg-coup-card/80 backdrop-blur-sm border border-coup-border rounded-2xl;
+        @apply shadow-2xl shadow-black/50;
+    }
+
+    .glow-border {
+        @apply border border-white/20;
+        box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .glow-border:hover {
+        @apply border-white/40;
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);
     }
 }
