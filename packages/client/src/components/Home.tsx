@@ -1,4 +1,5 @@
 import { FC, useState } from 'react';
+import { Cheatsheet } from './Cheatsheet';
 
 interface HomeProps {
     onCreateRoom: (playerName: string, onStatusChange?: (status: string) => void) => Promise<boolean>;
@@ -10,6 +11,7 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
     const [playerName, setPlayerName] = useState('');
     const [roomCode, setRoomCode] = useState('');
     const [mode, setMode] = useState<'menu' | 'create' | 'join'>('menu');
+    const [showCheatsheet, setShowCheatsheet] = useState(false);
     const [loading, setLoading] = useState(false);
     const [connectionStatus, setConnectionStatus] = useState<string | null>(null);
 
@@ -40,6 +42,8 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
 
     return (
         <div className="page-container min-h-screen flex items-center justify-center p-6">
+            <Cheatsheet isOpen={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
+
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-amber-500/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-1/4 right-1/4 w-80 h-80 bg-violet-500/5 rounded-full blur-3xl" />
@@ -75,6 +79,12 @@ export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
                             className="btn-secondary w-full py-4 text-base"
                         >
                             Join Room
+                        </button>
+                        <button
+                            onClick={() => setShowCheatsheet(true)}
+                            className="w-full py-3 text-sm text-zinc-400 hover:text-zinc-200 transition-colors"
+                        >
+                            How to Play
                         </button>
 
                         <div className="pt-8 flex items-center gap-4">
