@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, useState } from 'react';
 import { GameState, GamePhase, ChatMessage } from '@coup/shared';
 import { PlayerInfo } from './PlayerInfo';
 import { ActionButtons } from './ActionButtons';
@@ -8,6 +8,7 @@ import { ExchangeModal } from './ExchangeModal';
 import { GameLog } from './GameLog';
 import { Chat } from './Chat';
 import { Card } from './Card';
+import { Cheatsheet, CheatsheetButton } from './Cheatsheet';
 
 interface GameBoardProps {
     gameState: GameState;
@@ -38,6 +39,8 @@ export const GameBoard: FC<GameBoardProps> = ({
     onSendChat,
     onLeaveRoom,
 }) => {
+    const [showCheatsheet, setShowCheatsheet] = useState(false);
+
     const myPlayer = gameState.players.find(p => p.id === playerId);
     const otherPlayers = gameState.players.filter(p => p.id !== playerId);
     const currentPlayer = gameState.players[gameState.currentPlayerIndex];
@@ -97,6 +100,8 @@ export const GameBoard: FC<GameBoardProps> = ({
 
     return (
         <div className="page-container min-h-screen">
+            <Cheatsheet isOpen={showCheatsheet} onClose={() => setShowCheatsheet(false)} />
+
             {needToLoseInfluence && myPlayer && (
                 <LoseInfluenceModal
                     cards={myPlayer.cards}
@@ -123,9 +128,12 @@ export const GameBoard: FC<GameBoardProps> = ({
                                 <span className="font-mono text-sm text-zinc-300">{gameState.roomId}</span>
                             </div>
                         </div>
-                        <button onClick={onLeaveRoom} className="btn-secondary text-xs py-2 px-4">
-                            Leave
-                        </button>
+                        <div className="flex items-center gap-2">
+                            <CheatsheetButton onClick={() => setShowCheatsheet(true)} />
+                            <button onClick={onLeaveRoom} className="btn-secondary text-xs py-2 px-4">
+                                Leave
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
