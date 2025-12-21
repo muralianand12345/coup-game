@@ -4,6 +4,7 @@
     "version": "2.0.2",
     "type": "module",
     "license": "MIT",
+    "readme": "README.md",
     "scripts": {
         "dev": "vite",
         "build": "tsc -b && vite build",
