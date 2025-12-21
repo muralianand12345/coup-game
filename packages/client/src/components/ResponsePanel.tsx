@@ -34,7 +34,8 @@ export const ResponsePanel: FC<ResponsePanelProps> = ({
     onPass,
     onBlock,
 }) => {
-    const { phase, pendingAction, pendingBlock, players } = gameState;
+    const { phase, pendingAction, pendingBlock, players, passedPlayers = [] } = gameState;
+    const hasPassed = passedPlayers.includes(playerId);
 
     const getPlayerName = (id: string) =>
         players.find(p => p.id === id)?.name || 'Unknown';
@@ -59,8 +60,21 @@ export const ResponsePanel: FC<ResponsePanelProps> = ({
         }
 
         const canChallenge = pendingAction.canBeChallenged;
-        const canBlock = pendingAction.canBeBlocked &&
-            (isTarget || pendingAction.blockableBy.includes(CardType.DUKE));
+        const canBlock = pendingAction.canBeBlocked && (isTarget || pendingAction.blockableBy.includes(CardType.DUKE));
+
+        if (hasPassed) {
+            return (
+                <div className="glass-panel p-6 animate-fade-in-up">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-zinc-400 text-sm">You passed</p>
+                            <p className="text-zinc-600 text-xs mt-1">Waiting for other players...</p>
+                        </div>
+                        <TimerRing value={timer} />
+                    </div>
+                </div>
+            );
+        }
 
         return (
             <div className="glass-panel p-6 animate-scale-in">
@@ -123,6 +137,20 @@ export const ResponsePanel: FC<ResponsePanelProps> = ({
                             <p className="text-zinc-600 text-xs mt-1">
                                 You blocked with {pendingBlock.claimedCard}
                             </p>
+                        </div>
+                        <TimerRing value={timer} />
+                    </div>
+                </div>
+            );
+        }
+
+        if (hasPassed) {
+            return (
+                <div className="glass-panel p-6 animate-fade-in-up">
+                    <div className="flex items-center justify-between">
+                        <div>
+                            <p className="text-zinc-400 text-sm">You accepted the block</p>
+                            <p className="text-zinc-600 text-xs mt-1">Waiting for other players...</p>
                         </div>
                         <TimerRing value={timer} />
                     </div>

@@ -1,5 +1,5 @@
-import { FC, useRef, useEffect } from 'react';
 import { LogEntry } from '@coup/shared';
+import { FC, useRef, useEffect } from 'react';
 
 interface GameLogProps {
     logs: LogEntry[];

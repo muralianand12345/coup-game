@@ -1,10 +1,11 @@
-import express from 'express';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 import cors from 'cors';
 import dotenv from 'dotenv';
+import express from 'express';
+import { Server } from 'socket.io';
+import { createServer } from 'http';
 import { ClientToServerEvents, ServerToClientEvents } from '@coup/shared';
 import { setupSocketHandlers } from './socket/handlers';
+import { cleanupEmptyRooms, getRoomCount } from './room/manager';
 
 dotenv.config();
 
@@ -25,6 +26,11 @@ app.get('/health', (_req, res) => {
 setupSocketHandlers(io);
 
 const PORT = process.env.PORT || 3001;
+
+setInterval(() => {
+	cleanupEmptyRooms();
+	console.log(`Active rooms: ${getRoomCount()}`);
+}, 60000);
 
 httpServer.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`);

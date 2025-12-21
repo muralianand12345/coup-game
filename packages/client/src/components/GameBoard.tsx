@@ -1,13 +1,13 @@
 import { FC, useState } from 'react';
 import { GameState, GamePhase, ChatMessage } from '@coup/shared';
+import { Chat } from './Chat';
+import { Card } from './Card';
+import { GameLog } from './GameLog';
 import { PlayerInfo } from './PlayerInfo';
 import { ActionButtons } from './ActionButtons';
 import { ResponsePanel } from './ResponsePanel';
-import { LoseInfluenceModal } from './LoseInfluenceModal';
 import { ExchangeModal } from './ExchangeModal';
-import { GameLog } from './GameLog';
-import { Chat } from './Chat';
-import { Card } from './Card';
+import { LoseInfluenceModal } from './LoseInfluenceModal';
 import { Cheatsheet, CheatsheetButton } from './Cheatsheet';
 
 interface GameBoardProps {

@@ -1,9 +1,9 @@
 import { Server, Socket } from 'socket.io';
 import { ClientToServerEvents, ServerToClientEvents, GamePhase, ActionType, CardType, ACTION_CONFIG, ChatMessage } from '@coup/shared';
-import * as RoomManager from '../room/manager';
 import * as GameEngine from '../game/engine';
-import { startTimer, stopTimer } from '../game/timer';
 import { generateId } from '../utils/helpers';
+import * as RoomManager from '../room/manager';
+import { startTimer, stopTimer } from '../game/timer';
 
 type TypedServer = Server<ClientToServerEvents, ServerToClientEvents>;
 type TypedSocket = Socket<ClientToServerEvents, ServerToClientEvents>;
@@ -23,10 +23,13 @@ const broadcastGameState = (io: TypedServer, roomId: string): void => {
 	const room = RoomManager.getRoom(roomId);
 	if (!room || !room.gameState) return;
 
+	const passed = Array.from(getPassedPlayers(roomId));
+
 	room.players.forEach((player) => {
 		const socketId = RoomManager.getSocketIdByPlayerId(player.id);
 		if (socketId) {
 			const publicState = GameEngine.getPublicGameState(room.gameState!, player.id);
+			(publicState as any).passedPlayers = passed;
 			io.to(socketId).emit('gameStateUpdate', publicState);
 		}
 	});
@@ -69,6 +72,21 @@ const handleAllPassed = (io: TypedServer, roomId: string): void => {
 	}
 };
 
+const checkForWinnerAfterDisconnect = (io: TypedServer, room: ReturnType<typeof RoomManager.getRoom>): void => {
+	if (!room || !room.gameState) return;
+
+	const state = room.gameState;
+	GameEngine.checkForWinner(state);
+
+	if (state.phase === GamePhase.GAME_OVER) {
+		stopTimer(room.id);
+		clearPassedPlayers(room.id);
+	}
+
+	RoomManager.updateGameState(room.id, state);
+	broadcastGameState(io, room.id);
+};
+
 export const setupSocketHandlers = (io: TypedServer): void => {
 	io.on('connection', (socket: TypedSocket) => {
 		console.log(`Client connected: ${socket.id}`);
@@ -90,30 +108,12 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 			}
 		});
 
-		socket.on('rejoinRoom', (roomId, playerId, callback) => {
-			const room = RoomManager.rejoinRoom(roomId.toUpperCase(), playerId, socket.id);
-			if (room) {
-				socket.join(roomId.toUpperCase());
-				callback({ success: true, room, playerId });
-				io.to(roomId.toUpperCase()).emit('roomUpdate', room);
-				io.to(roomId.toUpperCase()).emit('playerReconnected', playerId);
-				if (room.gameState) {
-					broadcastGameState(io, roomId.toUpperCase());
-				}
-			} else {
-				callback({ success: false, error: 'Unable to rejoin room' });
-			}
-		});
-
 		socket.on('leaveRoom', () => {
 			const { room, playerId } = RoomManager.leaveRoom(socket.id);
 			if (room && playerId) {
 				socket.leave(room.id);
 				io.to(room.id).emit('roomUpdate', room);
-				if (room.isStarted) {
-					io.to(room.id).emit('playerDisconnected', playerId);
-					broadcastGameState(io, room.id);
-				}
+				if (room.isStarted && room.gameState) checkForWinnerAfterDisconnect(io, room);
 			}
 		});
 
@@ -203,7 +203,11 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 
 			getPassedPlayers(room.id).add(playerId);
 
-			if (checkAllPlayersPassed(io, room.id)) handleAllPassed(io, room.id);
+			if (checkAllPlayersPassed(io, room.id)) {
+				handleAllPassed(io, room.id);
+			} else {
+				broadcastGameState(io, room.id);
+			}
 		});
 
 		socket.on('block', (cardType: CardType) => {
@@ -316,10 +320,7 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 			const { room, playerId } = RoomManager.leaveRoom(socket.id);
 			if (room && playerId) {
 				io.to(room.id).emit('roomUpdate', room);
-				if (room.isStarted) {
-					io.to(room.id).emit('playerDisconnected', playerId);
-					broadcastGameState(io, room.id);
-				}
+				if (room.isStarted && room.gameState) checkForWinnerAfterDisconnect(io, room);
 			}
 		});
 	});

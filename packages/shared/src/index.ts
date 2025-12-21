@@ -73,6 +73,7 @@ export interface GameState {
 	winner: string | null;
 	turnTimeRemaining: number;
 	gameLog: LogEntry[];
+	passedPlayers: string[];
 }
 
 export interface LogEntry {

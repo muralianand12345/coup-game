@@ -1,5 +1,5 @@
-import { FC, useState, useRef, useEffect } from 'react';
 import { ChatMessage } from '@coup/shared';
+import { FC, useState, useRef, useEffect } from 'react';
 
 interface ChatProps {
     messages: ChatMessage[];
