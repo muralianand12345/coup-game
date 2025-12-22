@@ -1,8 +1,8 @@
 import { FC, useState } from 'react';
 import { Cheatsheet } from './Cheatsheet';
 import { SoundToggle } from './SoundToggle';
+import { version } from '../../package.json';
 import { audioManager } from '../services/audio';
-import { version } from '../../../../package.json';
 import { useOnlineStore } from '../store/onlineStore';
 
 interface HomeProps {
