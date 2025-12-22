@@ -26,19 +26,11 @@ const TimerRing: FC<{ value: number; max?: number }> = ({ value, max = 30 }) => 
     );
 };
 
-export const ResponsePanel: FC<ResponsePanelProps> = ({
-    gameState,
-    playerId,
-    timer,
-    onChallenge,
-    onPass,
-    onBlock,
-}) => {
+export const ResponsePanel: FC<ResponsePanelProps> = ({ gameState, playerId, timer, onChallenge, onPass, onBlock }) => {
     const { phase, pendingAction, pendingBlock, players, passedPlayers = [] } = gameState;
     const hasPassed = passedPlayers.includes(playerId);
 
-    const getPlayerName = (id: string) =>
-        players.find(p => p.id === id)?.name || 'Unknown';
+    const getPlayerName = (id: string) => players.find(p => p.id === id)?.name || 'Unknown';
 
     const isActingPlayer = pendingAction?.playerId === playerId;
     const isBlockingPlayer = pendingBlock?.playerId === playerId;

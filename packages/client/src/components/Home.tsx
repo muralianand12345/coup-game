@@ -2,6 +2,7 @@ import { FC, useState } from 'react';
 import { Cheatsheet } from './Cheatsheet';
 import { SoundToggle } from './SoundToggle';
 import { audioManager } from '../services/audio';
+import { version } from '../../../../package.json';
 import { useOnlineStore } from '../store/onlineStore';
 
 interface HomeProps {
@@ -10,7 +11,7 @@ interface HomeProps {
     error: string | null;
 }
 
-const APP_VERSION = '2.1.0';
+const APP_VERSION = version;
 
 export const Home: FC<HomeProps> = ({ onCreateRoom, onJoinRoom, error }) => {
     const [playerName, setPlayerName] = useState('');

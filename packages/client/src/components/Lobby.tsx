@@ -11,13 +11,7 @@ interface LobbyProps {
     onLeaveRoom: () => void;
 }
 
-export const Lobby: FC<LobbyProps> = ({
-    room,
-    playerId,
-    onToggleReady,
-    onStartGame,
-    onLeaveRoom,
-}) => {
+export const Lobby: FC<LobbyProps> = ({ room, playerId, onToggleReady, onStartGame, onLeaveRoom }) => {
     const [copied, setCopied] = useState(false);
 
     const isHost = room.hostId === playerId;

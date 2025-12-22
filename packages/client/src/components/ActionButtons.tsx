@@ -17,12 +17,7 @@ interface ActionButtonProps {
     variant?: 'default' | 'danger' | 'violet' | 'sky' | 'emerald';
 }
 
-export const ActionButtons: FC<ActionButtonsProps> = ({
-    myPlayer,
-    otherPlayers,
-    onAction,
-    disabled,
-}) => {
+export const ActionButtons: FC<ActionButtonsProps> = ({ myPlayer, otherPlayers, onAction, disabled, }) => {
     const [selectingTarget, setSelectingTarget] = useState<ActionType | null>(null);
     const [hoveredTarget, setHoveredTarget] = useState<string | null>(null);
 
@@ -201,26 +196,11 @@ export const ActionButtons: FC<ActionButtonsProps> = ({
                     />
                 </div>
             </div>
-
-            <div className="mt-4 pt-4 border-t border-zinc-800/50">
-                <div className="flex items-center justify-center gap-4 text-[10px] text-zinc-600">
-                    <span className="flex items-center gap-1">
-                        <kbd className="px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">1-4</kbd>
-                        Quick select
-                    </span>
-                </div>
-            </div>
         </div>
     );
 };
 
-const ActionButton: FC<ActionButtonProps> = ({
-    onClick,
-    disabled,
-    label,
-    description,
-    variant = 'default',
-}) => {
+const ActionButton: FC<ActionButtonProps> = ({ onClick, disabled, label, description, variant = 'default' }) => {
     const variantClasses = {
         default: 'border-zinc-700/50 hover:border-zinc-600',
         danger: 'border-red-500/30 hover:border-red-500/50',

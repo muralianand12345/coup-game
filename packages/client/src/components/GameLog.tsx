@@ -16,9 +16,7 @@ const logTypeStyles: Record<LogEntry['type'], { color: string; icon: string }> =
 export const GameLog: FC<GameLogProps> = ({ logs }) => {
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [logs]);
+    useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [logs]);
 
     return (
         <div className="glass-panel flex flex-col h-64 overflow-hidden">

@@ -9,12 +9,7 @@ interface MobilePlayerDrawerProps {
     logs: LogEntry[];
 }
 
-export const MobilePlayerDrawer: FC<MobilePlayerDrawerProps> = ({
-    players,
-    currentPlayerId,
-    myPlayerId,
-    logs,
-}) => {
+export const MobilePlayerDrawer: FC<MobilePlayerDrawerProps> = ({ players, currentPlayerId, myPlayerId, logs }) => {
     const [isOpen, setIsOpen] = useState(false);
     const otherPlayers = players.filter((p) => p.id !== myPlayerId);
     const alivePlayers = otherPlayers.filter((p) => p.isAlive);

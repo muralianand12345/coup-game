@@ -66,14 +66,10 @@ class AudioManager {
 				this.createTone(600, 0.1, 'sine');
 				break;
 			case 'win':
-				[523, 659, 784, 1047].forEach((freq, i) => {
-					setTimeout(() => this.createTone(freq, 0.2, 'sine'), i * 150);
-				});
+				[523, 659, 784, 1047].forEach((freq, i) => setTimeout(() => this.createTone(freq, 0.2, 'sine'), i * 150));
 				break;
 			case 'lose':
-				[400, 350, 300, 250].forEach((freq, i) => {
-					setTimeout(() => this.createTone(freq, 0.25, 'sine'), i * 200);
-				});
+				[400, 350, 300, 250].forEach((freq, i) => setTimeout(() => this.createTone(freq, 0.25, 'sine'), i * 200));
 				break;
 			case 'click':
 				this.createTone(500, 0.05, 'sine');

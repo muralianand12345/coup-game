@@ -7,10 +7,7 @@ interface LoseInfluenceModalProps {
     onSelectCard: (cardId: string) => void;
 }
 
-export const LoseInfluenceModal: FC<LoseInfluenceModalProps> = ({
-    cards,
-    onSelectCard,
-}) => {
+export const LoseInfluenceModal: FC<LoseInfluenceModalProps> = ({ cards, onSelectCard }) => {
     const unrevealedCards = cards.filter(c => !c.isRevealed);
 
     return (

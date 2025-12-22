@@ -39,8 +39,8 @@ export const Cheatsheet: FC<CheatsheetProps> = ({ isOpen, onClose }) => {
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as typeof activeTab)}
                             className={`flex-1 px-4 py-3 text-sm font-medium transition-colors flex items-center justify-center gap-2 ${activeTab === tab.id
-                                    ? 'bg-zinc-800/50 text-zinc-100 border-b-2 border-amber-500'
-                                    : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30'
+                                ? 'bg-zinc-800/50 text-zinc-100 border-b-2 border-amber-500'
+                                : 'text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/30'
                                 }`}
                         >
                             <span>{tab.icon}</span>
@@ -162,10 +162,7 @@ const RulesTab: FC = () => (
 );
 
 const CharactersTab: FC = () => {
-    const characters = Object.values(CardType).map((type) => ({
-        type,
-        ...CARD_INFO[type],
-    }));
+    const characters = Object.values(CardType).map((type) => ({ type, ...CARD_INFO[type] }));
 
     return (
         <div className="space-y-4">
