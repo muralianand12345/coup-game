@@ -260,17 +260,25 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 
 			if (!state.winner) {
 				if (state.phase === GamePhase.CHALLENGE_RESOLUTION) {
-					if (state.pendingAction && state.challengerId === playerId) {
-						GameEngine.executeAction(state);
-					} else if (state.pendingBlock && state.challengerId === playerId) {
-						GameEngine.addLogEntry(state, 'Block successful - action canceled', 'block');
-						GameEngine.advanceTurn(state);
-					} else if (state.pendingAction && !state.pendingBlock) {
-						GameEngine.executeAction(state);
+					const challengerLostChallenge = state.challengerId === playerId;
+
+					if (challengerLostChallenge) {
+						if (state.pendingBlock) {
+							GameEngine.addLogEntry(state, 'Block successful - action canceled', 'block');
+							GameEngine.advanceTurn(state);
+						} else if (state.pendingAction) {
+							GameEngine.executeAction(state);
+						} else {
+							GameEngine.advanceTurn(state);
+						}
 					} else {
-						state.pendingAction = null;
-						state.pendingBlock = null;
-						GameEngine.advanceTurn(state);
+						if (state.pendingBlock) {
+							GameEngine.executeAction(state);
+						} else {
+							state.pendingAction = null;
+							state.pendingBlock = null;
+							GameEngine.advanceTurn(state);
+						}
 					}
 				} else {
 					GameEngine.advanceTurn(state);
