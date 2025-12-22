@@ -21,6 +21,21 @@ export const disconnectSocket = (): void => {
 	if (socket?.connected) socket.disconnect();
 };
 
+export const getServerUrl = (): string => SERVER_URL;
+
+export const fetchOnlineCount = async (): Promise<number> => {
+	try {
+		const response = await fetch(`${SERVER_URL}/stats`, { signal: AbortSignal.timeout(5000) });
+		if (response.ok) {
+			const data = await response.json();
+			return data.onlineCount || 0;
+		}
+	} catch {
+		return 0;
+	}
+	return 0;
+};
+
 export const wakeUpServer = async (onStatusChange?: (status: string) => void): Promise<boolean> => {
 	const maxRetries = 5;
 	const baseDelay = 2000;

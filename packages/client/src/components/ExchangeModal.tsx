@@ -8,21 +8,13 @@ interface ExchangeModalProps {
     onConfirm: (keepCardIds: string[]) => void;
 }
 
-export const ExchangeModal: FC<ExchangeModalProps> = ({
-    cards,
-    keepCount,
-    onConfirm,
-}) => {
+export const ExchangeModal: FC<ExchangeModalProps> = ({ cards, keepCount, onConfirm }) => {
     const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
     const toggleCard = (cardId: string) => {
         setSelectedIds(prev => {
-            if (prev.includes(cardId)) {
-                return prev.filter(id => id !== cardId);
-            }
-            if (prev.length < keepCount) {
-                return [...prev, cardId];
-            }
+            if (prev.includes(cardId)) return prev.filter(id => id !== cardId);
+            if (prev.length < keepCount) return [...prev, cardId];
             return prev;
         });
     };

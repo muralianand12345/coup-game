@@ -37,10 +37,7 @@ export const useGameStore = create<GameStore>((set, get) => ({
 	setPlayerId: (id) => set({ playerId: id }),
 	setRoom: (room) => set({ room }),
 	setGameState: (gameState) => set({ gameState }),
-	addChatMessage: (message) =>
-		set((state) => ({
-			chatMessages: [...state.chatMessages.slice(-99), message],
-		})),
+	addChatMessage: (message) => set((state) => ({ chatMessages: [...state.chatMessages.slice(-99), message] })),
 	setTimer: (timer) => set({ timer }),
 	setError: (error) => set({ error }),
 	reset: () => set(initialState),

@@ -13,16 +13,9 @@ interface CardBackProps {
     small?: boolean;
 }
 
-export const Card: FC<CardProps> = ({
-    card,
-    faceUp = false,
-    onClick,
-    selected = false,
-    small = false,
-}) => {
+export const Card: FC<CardProps> = ({ card, faceUp = false, onClick, selected = false, small = false, }) => {
     const showFace = faceUp && card;
     const info = card ? CARD_INFO[card.type] : null;
-
     const sizeClasses = small ? 'w-16 h-24' : 'w-24 h-36';
 
     if (!showFace) {

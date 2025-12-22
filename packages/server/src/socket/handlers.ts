@@ -178,15 +178,7 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 				if (challengeSuccess) state.pendingAction = null;
 			} else if (state.phase === GamePhase.BLOCK_RESPONSE && state.pendingBlock) {
 				const challengeSuccess = GameEngine.handleChallenge(state, playerId, state.pendingBlock.claimedCard, state.pendingBlock.playerId);
-
-				// If the challenge against the block is successful, the blocker must
-				// immediately lose influence. Keep the phase as CHALLENGE_RESOLUTION
-				// (set inside handleChallenge) and clear the pending block. Do NOT
-				// revert to ACTION_RESPONSE here, which caused a frozen timer and
-				// incorrect UI state.
-				if (challengeSuccess) {
-					state.pendingBlock = null;
-				}
+				if (challengeSuccess) state.pendingBlock = null;
 			}
 
 			RoomManager.updateGameState(room.id, state);
@@ -260,17 +252,25 @@ export const setupSocketHandlers = (io: TypedServer): void => {
 
 			if (!state.winner) {
 				if (state.phase === GamePhase.CHALLENGE_RESOLUTION) {
-					if (state.pendingAction && state.challengerId === playerId) {
-						GameEngine.executeAction(state);
-					} else if (state.pendingBlock && state.challengerId === playerId) {
-						GameEngine.addLogEntry(state, 'Block successful - action canceled', 'block');
-						GameEngine.advanceTurn(state);
-					} else if (state.pendingAction && !state.pendingBlock) {
-						GameEngine.executeAction(state);
+					const challengerLostChallenge = state.challengerId === playerId;
+
+					if (challengerLostChallenge) {
+						if (state.pendingBlock) {
+							GameEngine.addLogEntry(state, 'Block successful - action canceled', 'block');
+							GameEngine.advanceTurn(state);
+						} else if (state.pendingAction) {
+							GameEngine.executeAction(state);
+						} else {
+							GameEngine.advanceTurn(state);
+						}
 					} else {
-						state.pendingAction = null;
-						state.pendingBlock = null;
-						GameEngine.advanceTurn(state);
+						if (state.pendingBlock) {
+							GameEngine.executeAction(state);
+						} else {
+							state.pendingAction = null;
+							state.pendingBlock = null;
+							GameEngine.advanceTurn(state);
+						}
 					}
 				} else {
 					GameEngine.advanceTurn(state);

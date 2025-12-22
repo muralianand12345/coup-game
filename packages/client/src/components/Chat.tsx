@@ -11,9 +11,7 @@ export const Chat: FC<ChatProps> = ({ messages, onSendMessage, playerId }) => {
     const [input, setInput] = useState('');
     const bottomRef = useRef<HTMLDivElement>(null);
 
-    useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
+    useEffect(() => bottomRef.current?.scrollIntoView({ behavior: 'smooth' }), [messages]);
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();

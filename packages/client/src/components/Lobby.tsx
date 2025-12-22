@@ -1,5 +1,7 @@
 import { FC, useState } from 'react';
 import { Room, MIN_PLAYERS } from '@coup/shared';
+import { SoundToggle } from './SoundToggle';
+import { audioManager } from '../services/audio';
 
 interface LobbyProps {
     room: Room;
@@ -9,13 +11,7 @@ interface LobbyProps {
     onLeaveRoom: () => void;
 }
 
-export const Lobby: FC<LobbyProps> = ({
-    room,
-    playerId,
-    onToggleReady,
-    onStartGame,
-    onLeaveRoom,
-}) => {
+export const Lobby: FC<LobbyProps> = ({ room, playerId, onToggleReady, onStartGame, onLeaveRoom }) => {
     const [copied, setCopied] = useState(false);
 
     const isHost = room.hostId === playerId;
@@ -24,9 +20,25 @@ export const Lobby: FC<LobbyProps> = ({
     const canStart = room.players.length >= MIN_PLAYERS && allReady;
 
     const copyRoomCode = () => {
+        audioManager.play('click');
         navigator.clipboard.writeText(room.id);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleToggleReady = () => {
+        audioManager.play('click');
+        onToggleReady();
+    };
+
+    const handleStartGame = () => {
+        audioManager.play('click');
+        onStartGame();
+    };
+
+    const handleLeaveRoom = () => {
+        audioManager.play('click');
+        onLeaveRoom();
     };
 
     return (
@@ -34,6 +46,10 @@ export const Lobby: FC<LobbyProps> = ({
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-1/3 right-1/4 w-96 h-96 bg-emerald-500/5 rounded-full blur-3xl" />
                 <div className="absolute bottom-1/3 left-1/4 w-80 h-80 bg-amber-500/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="absolute top-4 right-4 z-20">
+                <SoundToggle />
             </div>
 
             <div className="glass-panel p-8 max-w-lg w-full animate-scale-in relative z-10">
@@ -79,15 +95,15 @@ export const Lobby: FC<LobbyProps> = ({
                             <div
                                 key={player.id}
                                 className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 animate-fade-in-up ${player.id === playerId
-                                        ? 'bg-zinc-900/80 border-zinc-700'
-                                        : 'bg-zinc-900/40 border-zinc-800/50'
+                                    ? 'bg-zinc-900/80 border-zinc-700'
+                                    : 'bg-zinc-900/40 border-zinc-800/50'
                                     }`}
                                 style={{ animationDelay: `${index * 0.05}s` }}
                             >
                                 <div className="flex items-center gap-3">
                                     <div className={`w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold ${player.id === playerId
-                                            ? 'bg-zinc-100 text-zinc-900'
-                                            : 'bg-zinc-800 text-zinc-400'
+                                        ? 'bg-zinc-100 text-zinc-900'
+                                        : 'bg-zinc-800 text-zinc-400'
                                         }`}>
                                         {player.name.charAt(0).toUpperCase()}
                                     </div>
@@ -133,7 +149,7 @@ export const Lobby: FC<LobbyProps> = ({
                 <div className="space-y-3">
                     {isHost ? (
                         <button
-                            onClick={onStartGame}
+                            onClick={handleStartGame}
                             disabled={!canStart}
                             className="btn-primary w-full py-4"
                         >
@@ -145,14 +161,14 @@ export const Lobby: FC<LobbyProps> = ({
                         </button>
                     ) : (
                         <button
-                            onClick={onToggleReady}
+                            onClick={handleToggleReady}
                             className={`w-full py-4 ${myPlayer?.isReady ? 'btn-secondary' : 'btn-primary'}`}
                         >
                             {myPlayer?.isReady ? 'Cancel Ready' : "I'm Ready"}
                         </button>
                     )}
 
-                    <button onClick={onLeaveRoom} className="btn-secondary w-full py-3 text-zinc-400">
+                    <button onClick={handleLeaveRoom} className="btn-secondary w-full py-3 text-zinc-400">
                         Leave Room
                     </button>
                 </div>

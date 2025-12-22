@@ -110,9 +110,7 @@ export const togglePlayerReady = (socketId: string): Room | null => {
 	if (!room || room.isStarted) return null;
 
 	const player = room.players.find((p) => p.id === playerId);
-	if (player) {
-		player.isReady = !player.isReady;
-	}
+	if (player) player.isReady = !player.isReady;
 
 	return room;
 };

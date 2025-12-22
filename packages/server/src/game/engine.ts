@@ -243,10 +243,7 @@ export const handleBlock = (state: GameState, blockerId: string, claimedCard: Ca
 	const blocker = getPlayerById(state, blockerId);
 	if (!blocker) return;
 
-	state.pendingBlock = {
-		playerId: blockerId,
-		claimedCard,
-	};
+	state.pendingBlock = { playerId: blockerId, claimedCard };
 	state.phase = GamePhase.BLOCK_RESPONSE;
 	addLogEntry(state, `${blocker.name} blocks with ${claimedCard}`, 'block');
 };
