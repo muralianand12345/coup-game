@@ -1,10 +1,12 @@
 import { useEffect, useCallback } from 'react';
 import { ActionType, CardType } from '@coup/shared';
 import { useGameStore } from '../store/gameStore';
-import { getSocket, connectSocket, wakeUpServer, waitForSocketConnection } from '../services/socket';
+import { useOnlineStore } from '../store/onlineStore';
+import { getSocket, connectSocket, wakeUpServer, waitForSocketConnection, fetchOnlineCount } from '../services/socket';
 
 export const useSocket = () => {
 	const { setPlayerId, setRoom, setGameState, addChatMessage, setTimer, setError, reset } = useGameStore();
+	const { setOnlineCount } = useOnlineStore();
 
 	useEffect(() => {
 		connectSocket();
@@ -17,6 +19,14 @@ export const useSocket = () => {
 		socket.on('error', (message) => setError(message));
 		socket.on('playerDisconnected', (playerId) => console.log('Player disconnected:', playerId));
 
+		const updateOnlineCount = async () => {
+			const count = await fetchOnlineCount();
+			setOnlineCount(count);
+		};
+
+		updateOnlineCount();
+		const pollInterval = setInterval(updateOnlineCount, 30000);
+
 		return () => {
 			socket.off('roomUpdate');
 			socket.off('gameStateUpdate');
@@ -24,12 +34,12 @@ export const useSocket = () => {
 			socket.off('timerUpdate');
 			socket.off('error');
 			socket.off('playerDisconnected');
+			clearInterval(pollInterval);
 		};
-	}, [setPlayerId, setRoom, setGameState, addChatMessage, setTimer, setError]);
+	}, [setPlayerId, setRoom, setGameState, addChatMessage, setTimer, setError, setOnlineCount]);
 
 	const ensureConnection = useCallback(async (onStatusChange?: (status: string) => void): Promise<boolean> => {
 		const socket = getSocket();
-
 		if (socket.connected) return true;
 
 		const serverAwake = await wakeUpServer(onStatusChange);

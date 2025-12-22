@@ -19,9 +19,8 @@ const io = new Server<ClientToServerEvents, ServerToClientEvents>(httpServer, { 
 app.use(cors({ origin: clientUrl, credentials: true }));
 app.use(express.json());
 
-app.get('/health', (_req, res) => {
-	res.json({ status: 'ok', timestamp: Date.now() });
-});
+app.get('/health', (_req, res) => res.json({ status: 'ok', timestamp: Date.now(), onlineCount: io.engine.clientsCount }));
+app.get('/stats', (_req, res) => res.json({ onlineCount: io.engine.clientsCount, roomCount: getRoomCount(), timestamp: Date.now() }));
 
 setupSocketHandlers(io);
 
@@ -29,7 +28,7 @@ const PORT = process.env.PORT || 3001;
 
 setInterval(() => {
 	cleanupEmptyRooms();
-	console.log(`Active rooms: ${getRoomCount()}`);
+	console.log(`Active rooms: ${getRoomCount()}, Online users: ${io.engine.clientsCount}`);
 }, 60000);
 
 httpServer.listen(PORT, () => {
