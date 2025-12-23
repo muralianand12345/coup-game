@@ -1,0 +1,40 @@
+{
+	"name": "Coup Online - Multiplayer Bluffing Card Game",
+	"short_name": "Coup Online",
+	"description": "Play Coup online for free with friends! A real-time multiplayer bluffing card game for 2-6 players.",
+	"start_url": "/",
+	"display": "standalone",
+	"background_color": "#09090b",
+	"theme_color": "#09090b",
+	"orientation": "any",
+	"scope": "/",
+	"lang": "en",
+	"categories": ["games", "entertainment"],
+	"icons": [
+		{
+			"src": "/favicon-192.png",
+			"sizes": "192x192",
+			"type": "image/png",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/favicon-512.png",
+			"sizes": "512x512",
+			"type": "image/png",
+			"purpose": "any maskable"
+		},
+		{
+			"src": "/favicon.svg",
+			"sizes": "any",
+			"type": "image/svg+xml"
+		}
+	],
+	"screenshots": [
+		{
+			"src": "/og-image.png",
+			"sizes": "1200x630",
+			"type": "image/png",
+			"label": "Coup Online Game Preview"
+		}
+	]
+}
