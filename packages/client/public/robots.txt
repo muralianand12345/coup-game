@@ -1,0 +1,11 @@
+# Robots.txt for Coup Online
+# https://coup.muralianand.in
+
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://coup.muralianand.in/sitemap.xml
+
+# Crawl-delay (optional, be nice to the server)
+Crawl-delay: 1

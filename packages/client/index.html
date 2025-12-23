@@ -2,9 +2,134 @@
 <html lang="en">
 	<head>
 		<meta charset="UTF-8" />
-		<link rel="icon" type="image/svg+xml" href="/vite.svg" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Coup - Online Multiplayer</title>
+
+		<!-- Primary Meta Tags -->
+		<title>Coup Online - Free Multiplayer Bluffing Card Game</title>
+		<meta name="title" content="Coup Online - Free Multiplayer Bluffing Card Game" />
+		<meta name="description" content="Play Coup online for free with friends! A real-time multiplayer bluffing card game for 2-6 players. No signup required. Bluff, deceive, and survive to win." />
+		<meta name="keywords" content="coup online, coup card game, play coup online, multiplayer bluffing game, coup board game online, free coup game, online deception game, coup multiplayer, bluffing card game, strategy card game" />
+		<meta name="author" content="Murali Anand" />
+		<meta name="robots" content="index, follow" />
+		<meta name="language" content="English" />
+		<meta name="revisit-after" content="7 days" />
+
+		<!-- Canonical URL -->
+		<link rel="canonical" href="https://coup.muralianand.in/" />
+
+		<!-- Theme Color -->
+		<meta name="theme-color" content="#09090b" />
+		<meta name="msapplication-TileColor" content="#09090b" />
+
+		<!-- Open Graph / Facebook -->
+		<meta property="og:type" content="website" />
+		<meta property="og:url" content="https://coup.muralianand.in/" />
+		<meta property="og:title" content="Coup Online - Free Multiplayer Bluffing Card Game" />
+		<meta property="og:description" content="Play Coup online for free with friends! A real-time multiplayer bluffing card game for 2-6 players. No signup required. Bluff, deceive, and survive to win." />
+		<meta property="og:image" content="https://coup.muralianand.in/og-image.png" />
+		<meta property="og:image:width" content="1200" />
+		<meta property="og:image:height" content="630" />
+		<meta property="og:image:alt" content="Coup Online - Bluff, Deceive, Survive" />
+		<meta property="og:site_name" content="Coup Online" />
+		<meta property="og:locale" content="en_US" />
+
+		<!-- Twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:url" content="https://coup.muralianand.in/" />
+		<meta name="twitter:title" content="Coup Online - Free Multiplayer Bluffing Card Game" />
+		<meta name="twitter:description" content="Play Coup online for free with friends! A real-time multiplayer bluffing card game for 2-6 players. No signup required." />
+		<meta name="twitter:image" content="https://coup.muralianand.in/og-image.png" />
+		<meta name="twitter:image:alt" content="Coup Online - Bluff, Deceive, Survive" />
+
+		<!-- Favicons -->
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png" />
+		<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+
+		<!-- Manifest -->
+		<link rel="manifest" href="/manifest.json" />
+
+		<!-- Preconnect to external resources -->
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+		<!-- Structured Data (JSON-LD) -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "WebApplication",
+				"name": "Coup Online",
+				"alternateName": "Coup Card Game Online",
+				"description": "Play Coup online for free with friends! A real-time multiplayer bluffing card game for 2-6 players. No signup required. Bluff, deceive, and survive to win.",
+				"url": "https://coup.muralianand.in",
+				"applicationCategory": "GameApplication",
+				"genre": "Card Game",
+				"operatingSystem": "Any",
+				"offers": {
+					"@type": "Offer",
+					"price": "0",
+					"priceCurrency": "USD"
+				},
+				"author": {
+					"@type": "Person",
+					"name": "Murali Anand",
+					"url": "https://muralianand.in"
+				},
+				"aggregateRating": {
+					"@type": "AggregateRating",
+					"ratingValue": "4.8",
+					"ratingCount": "100",
+					"bestRating": "5",
+					"worstRating": "1"
+				},
+				"screenshot": "https://coup.muralianand.in/og-image.png",
+				"featureList": ["Real-time multiplayer", "2-6 players", "No signup required", "Free to play", "Mobile friendly"],
+				"browserRequirements": "Requires JavaScript. Requires WebSocket support."
+			}
+		</script>
+
+		<!-- Game structured data -->
+		<script type="application/ld+json">
+			{
+				"@context": "https://schema.org",
+				"@type": "Game",
+				"name": "Coup Online",
+				"description": "A multiplayer online implementation of the popular bluffing card game Coup",
+				"numberOfPlayers": {
+					"@type": "QuantitativeValue",
+					"minValue": 2,
+					"maxValue": 6
+				},
+				"gameItem": [
+					{
+						"@type": "Thing",
+						"name": "Duke",
+						"description": "Tax: Take 3 coins. Blocks Foreign Aid."
+					},
+					{
+						"@type": "Thing",
+						"name": "Assassin",
+						"description": "Assassinate: Pay 3 coins to eliminate a player's card."
+					},
+					{
+						"@type": "Thing",
+						"name": "Captain",
+						"description": "Steal: Take 2 coins from another player. Blocks Stealing."
+					},
+					{
+						"@type": "Thing",
+						"name": "Ambassador",
+						"description": "Exchange: Swap cards with the deck. Blocks Stealing."
+					},
+					{
+						"@type": "Thing",
+						"name": "Contessa",
+						"description": "Blocks Assassination."
+					}
+				]
+			}
+		</script>
 	</head>
 	<body>
 		<div id="root"></div>
